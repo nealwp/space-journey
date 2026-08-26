@@ -1,0 +1,13 @@
+{
+  "name": "space-journey",
+  "version": "1.0.0",
+  "description": "PixiJS Spacecraft Captain Console",
+  "license": "ISC",
+  "author": "nealwp",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  }
+}
