@@ -27,9 +27,15 @@ The components subsystem provides four reusable building blocks that all instrum
 
 Step 2 complete. All four components implemented and type-checked. CaptainConsole now uses `Panel` instead of inline drawing logic. Components are ready for use by instrument displays in Steps 4–8.
 
+TelemetryText has been enhanced for Step 7:
+- Renders label and value horizontally on the same line (value right of label)
+- Accepts optional `labelWidth` to align values across instances within a display
+- Each display computes maxLabelWidth and passes it to all TelemetryText instances
+
 ## Gotchas / non-obvious constraints
 
 - Panel's `content` container is offset to the inner screen area — children position relative to usable space, not the bezel
 - TelemetryText mutates `.text` and `.style.fill` — never recreate Text objects
+- TelemetryText uses `labelWidth` option to align values — each display measures longest label
 - StatusIndicator's `update(dt)` must be called each frame for blink to work — only triggers on `alarm` state
 - BarMeter uses `Graphics.clear()` + redraw on each `setValue()` — acceptable for 1Hz updates, not per-frame
