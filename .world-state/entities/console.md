@@ -10,6 +10,7 @@ links:
   - core
   - components
   - terminal
+  - displays
   - planning
 ---
 Top-level orchestrator that owns the root container, draws the chassis, and composes all panel placeholders.
@@ -23,10 +24,11 @@ The console subsystem contains:
 
 ## Current state
 
-Step 3 complete. CaptainConsole renders:
+Step 4 complete. CaptainConsole renders:
 - Gray chassis with inner dark border
 - 11 labeled panel placeholders using `Panel` component
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
+- Exterior view in exteriorView panel — 20 drifting stars with labels
 - All panels positioned by ConsoleLayout
 - Proper cleanup via `destroy()` method
 
@@ -34,6 +36,6 @@ Step 3 complete. CaptainConsole renders:
 
 - CaptainConsole uses a `panelLabels` map to convert layout keys to abbreviated display labels — add new panels here
 - CaptainConsole owns the terminal submission flow — coordinates TerminalBuffer, TerminalInputController, MockTerminalService
-- CaptainConsole.update(dt) must be called each frame for cursor blinking — wired via ticker in main.ts
+- CaptainConsole.update(dt) must be called each frame for cursor blinking and star animation — wired via ticker in main.ts
 - The `destroy()` method cleans up TerminalInputController and all Panel instances
 - main.ts registers `beforeunload` handler — any new resources must also be cleaned up there
