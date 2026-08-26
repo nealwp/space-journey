@@ -18,6 +18,28 @@ npm run typecheck    # TypeScript type checking (tsc --noEmit)
 
 **Always run `npm run typecheck` before committing.** There is no test suite.
 
+## Working with .world-state/
+
+This repo tracks durable project context in `.world-state/`, separate
+from the code and from chat memory. Rules:
+
+1. Before starting any non-trivial task, read `.world-state/INDEX.md`.
+   It lists every entity, decision, and task file with a one-line
+   summary. Follow links only for files relevant to your task.
+2. Do not read every file in `.world-state/` up front. Load what the
+   task needs, use it, and stop carrying it once the task is done.
+3. If you change code under a path listed in some entity's
+   `owner_paths`, update that entity file in the same change (its
+   `updated` date and any facts that changed).
+4. Never edit a `decision` file after creation. If a decision changes,
+   write a new decision file and link back to the old one with
+   `status: superseded`.
+5. Run `wstate lint` before finishing. Fix broken links and
+   orphaned files it reports.
+6. If you create a new subsystem or concept worth remembering, run
+   `wstate new entity <id>` (or `decision`/`task`) rather
+   than inventing a new file by hand, so frontmatter stays consistent.
+
 ## Tech Stack
 
 - **PixiJS v8.20.1** — rendering engine (WebGL, async `Application.init()`)
