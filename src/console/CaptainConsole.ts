@@ -1,6 +1,7 @@
-import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { ConsoleTheme } from "./core/ConsoleTheme";
-import { Layout, DESIGN_WIDTH, DESIGN_HEIGHT, PanelRect } from "./core/ConsoleLayout";
+import { Layout, DESIGN_WIDTH, DESIGN_HEIGHT } from "./core/ConsoleLayout";
+import { Panel } from "./components/Panel";
 import type { Disposable } from "./core/ConsoleApplication";
 
 const panelLabels: Record<string, string> = {
@@ -18,7 +19,7 @@ const panelLabels: Record<string, string> = {
 };
 
 export class CaptainConsole extends Container implements Disposable {
-  private panelGraphics: Graphics[] = [];
+  private panels: Panel[] = [];
 
   constructor() {
     super();
@@ -50,48 +51,25 @@ export class CaptainConsole extends Container implements Disposable {
     const regions = Object.entries(Layout);
 
     for (const [key, rect] of regions) {
-      const g = this.drawPanel(rect, panelLabels[key] ?? key.toUpperCase());
-      this.panelGraphics.push(g);
-      this.addChild(g);
+      const panel = new Panel({
+        width: rect.width,
+        height: rect.height,
+        title: panelLabels[key] ?? key.toUpperCase(),
+      });
+
+      panel.x = rect.x;
+      panel.y = rect.y;
+
+      this.panels.push(panel);
+      this.addChild(panel);
     }
-  }
-
-  private drawPanel(rect: PanelRect, label: string): Graphics {
-    const g = new Graphics();
-
-    g.rect(rect.x, rect.y, rect.width, rect.height)
-      .fill(ConsoleTheme.colors.bezel);
-
-    const innerPad = ConsoleTheme.border.inner + 2;
-
-    g.rect(
-        rect.x + innerPad,
-        rect.y + innerPad,
-        rect.width - innerPad * 2,
-        rect.height - innerPad * 2
-      )
-      .fill(ConsoleTheme.colors.screen);
-
-    const labelStyle = new TextStyle({
-      fontFamily: ConsoleTheme.font.family,
-      fontSize: ConsoleTheme.font.titleSize,
-      fill: ConsoleTheme.colors.textDim,
-      letterSpacing: 1,
-    });
-
-    const labelText = new Text({ text: label, style: labelStyle });
-    labelText.x = rect.x + ConsoleTheme.spacing.sm;
-    labelText.y = rect.y + ConsoleTheme.spacing.xs;
-    g.addChild(labelText);
-
-    return g;
   }
 
   destroy(): void {
-    for (const g of this.panelGraphics) {
-      g.destroy({ children: true });
+    for (const panel of this.panels) {
+      panel.destroy({ children: true });
     }
-    this.panelGraphics = [];
+    this.panels = [];
     super.destroy({ children: true });
   }
 }

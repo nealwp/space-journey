@@ -10,6 +10,7 @@ below; edit the source files' frontmatter/summary lines instead._
 <!-- WSTATE:AUTO-START -->
 ## Entities
 
+- **[components](entities/components.md)** `current` — Reusable visual primitives for building instrument displays.
 - **[console](entities/console.md)** `current` — Top-level orchestrator that owns the root container, draws the chassis, and composes all panel placeholders.
 - **[core](entities/core.md)** `current` — Foundational layer: PixiJS v8 application wrapper, fixed 1280×720 layout, and shared theme constants.
 - **[planning](entities/planning.md)** `current` — Project documentation: full design specification (PLAN.md) and agent context (AGENTS.md).
