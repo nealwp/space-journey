@@ -28,8 +28,8 @@ Step 5 complete. CaptainConsole renders:
 - Gray chassis with inner dark border
 - 11 labeled panel placeholders using `Panel` component
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
-- Exterior view in exteriorView panel — 20 drifting stars with labels
-- Navigation map in navMap panel — trajectory plot with ship/destination markers
+- Exterior view in exteriorView panel — 20 drifting stars
+- Navigation map in navMap panel — dashed grid, trajectory arc, ship/destination markers, range/ETA readouts
 - All panels positioned by ConsoleLayout
 - Proper cleanup via `destroy()` method
 
