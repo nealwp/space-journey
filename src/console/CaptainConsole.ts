@@ -10,7 +10,11 @@ import { ExteriorView } from "./displays/ExteriorView";
 import { NavigationMap } from "./displays/NavigationMap";
 import { AlarmPanel } from "./displays/AlarmPanel";
 import { LogPanel } from "./displays/LogPanel";
-import type { NavigationDisplayData } from "./data/types";
+import { PowerDisplay } from "./displays/PowerDisplay";
+import { PropulsionDisplay } from "./displays/PropulsionDisplay";
+import { LifeSupportDisplay } from "./displays/LifeSupportDisplay";
+import { PowerDistributionDisplay } from "./displays/PowerDistributionDisplay";
+import { GravityEnvironmentDisplay } from "./displays/GravityEnvironmentDisplay";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
 
@@ -36,6 +40,11 @@ export class CaptainConsole extends Container implements Disposable {
   private navigationMap: NavigationMap | null = null;
   private alarmPanel: AlarmPanel | null = null;
   private logPanel: LogPanel | null = null;
+  private powerDisplay: PowerDisplay | null = null;
+  private propulsionDisplay: PropulsionDisplay | null = null;
+  private lifeSupportDisplay: LifeSupportDisplay | null = null;
+  private powerDistDisplay: PowerDistributionDisplay | null = null;
+  private gravEnvDisplay: GravityEnvironmentDisplay | null = null;
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
@@ -52,6 +61,11 @@ export class CaptainConsole extends Container implements Disposable {
     this.initNavigationMap();
     this.initAlarmPanel();
     this.initLogPanel();
+    this.initPowerDisplay();
+    this.initPropulsionDisplay();
+    this.initLifeSupportDisplay();
+    this.initPowerDistDisplay();
+    this.initGravEnvDisplay();
   }
 
   private drawChassis(): void {
@@ -205,6 +219,86 @@ export class CaptainConsole extends Container implements Disposable {
       { id: "l4", timestamp: "10:18:33", text: "COMM LINK OK" },
       { id: "l5", timestamp: "10:20:01", text: "FUEL CELLS NOMINAL" },
     ]);
+  }
+
+  private initPowerDisplay(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.powerSys.x && p.y === Layout.powerSys.y
+    );
+    if (!panel) return;
+
+    this.powerDisplay = new PowerDisplay();
+    panel.content.addChild(this.powerDisplay);
+
+    this.powerDisplay.setData({
+      generatorA: 98,
+      generatorB: 97,
+      reserve: 11,
+      status: "nominal",
+    });
+  }
+
+  private initPropulsionDisplay(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.propulsionSys.x && p.y === Layout.propulsionSys.y
+    );
+    if (!panel) return;
+
+    this.propulsionDisplay = new PropulsionDisplay();
+    panel.content.addChild(this.propulsionDisplay);
+
+    this.propulsionDisplay.setData({
+      thrust: 75,
+      fuel: 62,
+      driveStatus: "nominal",
+    });
+  }
+
+  private initLifeSupportDisplay(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.lifeSupport.x && p.y === Layout.lifeSupport.y
+    );
+    if (!panel) return;
+
+    this.lifeSupportDisplay = new LifeSupportDisplay();
+    panel.content.addChild(this.lifeSupportDisplay);
+
+    this.lifeSupportDisplay.setData({
+      o2: 21,
+      co2: 0.04,
+      temperature: 22.4,
+      humidity: 45,
+    });
+  }
+
+  private initPowerDistDisplay(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.powerDist.x && p.y === Layout.powerDist.y
+    );
+    if (!panel) return;
+
+    this.powerDistDisplay = new PowerDistributionDisplay();
+    panel.content.addChild(this.powerDistDisplay);
+
+    this.powerDistDisplay.setData({
+      gridStatus: "nominal",
+    });
+  }
+
+  private initGravEnvDisplay(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.gravEnv.x && p.y === Layout.gravEnv.y
+    );
+    if (!panel) return;
+
+    this.gravEnvDisplay = new GravityEnvironmentDisplay();
+    panel.content.addChild(this.gravEnvDisplay);
+
+    this.gravEnvDisplay.setData({
+      gForce: 1.0,
+      radiation: 0.12,
+      temperature: 21.8,
+    });
   }
 
   update(dt: number): void {

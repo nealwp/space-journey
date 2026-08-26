@@ -6,6 +6,7 @@ export interface TelemetryTextOptions {
   label?: string;
   value?: string;
   color?: TelemetryColor;
+  labelWidth?: number;
 }
 
 export class TelemetryText extends Container {
@@ -17,7 +18,7 @@ export class TelemetryText extends Container {
 
     const labelStyle = new TextStyle({
       fontFamily: ConsoleTheme.font.family,
-      fontSize: ConsoleTheme.font.labelSize,
+      fontSize: ConsoleTheme.font.valueSize,
       fill: ConsoleTheme.colors.textDim,
       letterSpacing: 1,
     });
@@ -34,7 +35,8 @@ export class TelemetryText extends Container {
     });
 
     this.valueText = new Text({ text: options.value ?? "", style: valueStyle });
-    this.valueText.y = ConsoleTheme.font.labelSize + ConsoleTheme.spacing.xs;
+    this.valueText.x = (options.labelWidth ?? this.labelText.width) + ConsoleTheme.spacing.md;
+    this.valueText.y = 0;
     this.addChild(this.valueText);
   }
 
