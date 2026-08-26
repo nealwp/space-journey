@@ -27,6 +27,7 @@ export class ConsoleApplication implements Disposable {
     });
 
     document.body.appendChild(this.app.canvas);
+    this.app.canvas.tabIndex = -1;
 
     this.app.stage.addChild(this.root);
 

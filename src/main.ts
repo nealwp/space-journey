@@ -8,6 +8,14 @@ async function main(): Promise<void> {
   const captainConsole = new CaptainConsole();
   consoleApp.root.addChild(captainConsole);
 
+  consoleApp.app.ticker.add((ticker) => {
+    captainConsole.update(ticker.deltaMS);
+  });
+
+  consoleApp.app.canvas.addEventListener("click", () => {
+    captainConsole.focusTerminal();
+  });
+
   window.addEventListener("beforeunload", () => {
     captainConsole.destroy();
     consoleApp.destroy();

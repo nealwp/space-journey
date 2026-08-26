@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Container, Graphics, Rectangle, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 
 export interface PanelOptions {
@@ -12,6 +12,7 @@ export class Panel extends Container {
 
   private bezel: Graphics;
   private screen: Graphics;
+  private contentMask: Graphics;
   private titleText: Text | null = null;
 
   private panelWidth: number;
@@ -32,6 +33,10 @@ export class Panel extends Container {
     this.content = new Container();
     this.addChild(this.content);
 
+    this.contentMask = new Graphics();
+    this.addChild(this.contentMask);
+    this.content.mask = this.contentMask;
+
     if (options.title) {
       const style = new TextStyle({
         fontFamily: ConsoleTheme.font.family,
@@ -50,6 +55,7 @@ export class Panel extends Container {
   private draw(): void {
     this.bezel.clear();
     this.screen.clear();
+    this.contentMask.clear();
 
     this.bezel
       .rect(0, 0, this.panelWidth, this.panelHeight)
@@ -62,12 +68,25 @@ export class Panel extends Container {
       .fill(ConsoleTheme.colors.screen);
 
     this.content.x = innerPad;
-    this.content.y = innerPad;
+
+    const maskWidth = this.panelWidth - innerPad * 2;
+    let maskY = innerPad;
+    let maskHeight = this.panelHeight - innerPad * 2;
 
     if (this.titleText) {
       this.titleText.x = ConsoleTheme.spacing.sm;
       this.titleText.y = ConsoleTheme.spacing.xs;
+      const titleOffset = ConsoleTheme.spacing.xs + ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs;
+      maskY = innerPad + titleOffset;
+      maskHeight = this.panelHeight - innerPad - titleOffset;
+      this.content.y = maskY;
+    } else {
+      this.content.y = innerPad;
     }
+
+    this.contentMask
+      .rect(0, maskY, maskWidth, maskHeight)
+      .fill(0xffffff);
   }
 
   resize(width: number, height: number): void {

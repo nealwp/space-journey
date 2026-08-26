@@ -14,6 +14,7 @@ below; edit the source files' frontmatter/summary lines instead._
 - **[console](entities/console.md)** `current` — Top-level orchestrator that owns the root container, draws the chassis, and composes all panel placeholders.
 - **[core](entities/core.md)** `current` — Foundational layer: PixiJS v8 application wrapper, fixed 1280×720 layout, and shared theme constants.
 - **[planning](entities/planning.md)** `current` — Project documentation: full design specification (PLAN.md) and agent context (AGENTS.md).
+- **[terminal](entities/terminal.md)** `current` — Command terminal — the single most important component. Strict separation of rendering, input, buffer, and service.
 
 ## Decisions (append-only log)
 
