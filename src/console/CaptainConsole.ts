@@ -7,12 +7,14 @@ import { TerminalBuffer } from "./terminal/TerminalBuffer";
 import { TerminalInputController } from "./terminal/TerminalInputController";
 import { MockTerminalService } from "./terminal/TerminalService";
 import { ExteriorView } from "./displays/ExteriorView";
+import { NavigationMap } from "./displays/NavigationMap";
+import type { NavigationDisplayData } from "./data/types";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
 
 const panelLabels: Record<string, string> = {
   exteriorView: "EXT VIEW",
-  navMap: "NAV MAP",
+  navMap: "NAV",
   mainTerminal: "MAIN TERM",
   alarmLog: "ALRM / LOG",
   alarmMatrix: "ALRM MATRIX",
@@ -28,6 +30,7 @@ export class CaptainConsole extends Container implements Disposable {
   private panels: Panel[] = [];
   private commandTerminal: CommandTerminal | null = null;
   private exteriorView: ExteriorView | null = null;
+  private navigationMap: NavigationMap | null = null;
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
@@ -41,6 +44,7 @@ export class CaptainConsole extends Container implements Disposable {
     this.drawPanels();
     this.initTerminal();
     this.initExteriorView();
+    this.initNavigationMap();
   }
 
   private drawChassis(): void {
@@ -121,6 +125,37 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.exteriorView = new ExteriorView(contentWidth, contentHeight);
     extPanel.content.addChild(this.exteriorView);
+  }
+
+  private initNavigationMap(): void {
+    const navPanel = this.panels.find(
+      (p) => p.x === Layout.navMap.x && p.y === Layout.navMap.y
+    );
+    if (!navPanel) return;
+
+    const innerPad = ConsoleTheme.border.inner + 2;
+    const contentWidth = Layout.navMap.width - innerPad * 2;
+    const contentHeight = Layout.navMap.height - innerPad * 2;
+
+    this.navigationMap = new NavigationMap(contentWidth, contentHeight);
+    navPanel.content.addChild(this.navigationMap);
+
+    this.navigationMap.setData({
+      shipX: contentWidth * 0.3,
+      shipY: contentHeight * 0.4,
+      destinationX: contentWidth * 0.75,
+      destinationY: contentHeight * 0.7,
+      rangeKm: 2_426_812,
+      etaSeconds: 3_013,
+      trajectoryPoints: [
+        { x: contentWidth * 0.3, y: contentHeight * 0.4 },
+        { x: contentWidth * 0.4, y: contentHeight * 0.25 },
+        { x: contentWidth * 0.55, y: contentHeight * 0.2 },
+        { x: contentWidth * 0.65, y: contentHeight * 0.35 },
+        { x: contentWidth * 0.7, y: contentHeight * 0.55 },
+        { x: contentWidth * 0.75, y: contentHeight * 0.7 },
+      ],
+    });
   }
 
   update(dt: number): void {
