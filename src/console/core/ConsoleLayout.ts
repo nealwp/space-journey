@@ -9,7 +9,8 @@ export interface LayoutRegions {
   exteriorView: PanelRect;
   navMap: PanelRect;
   mainTerminal: PanelRect;
-  alarmLog: PanelRect;
+  alarm: PanelRect;
+  log: PanelRect;
   alarmMatrix: PanelRect;
   powerSys: PanelRect;
   propulsionSys: PanelRect;
@@ -51,6 +52,8 @@ const botY = midY + MIDDLE_ROW_H + PANEL_GAP;
 
 const leftSplitH = (topRowH - PANEL_GAP) / 2;
 
+const rightSplitH = (topRowH + PANEL_GAP + MIDDLE_ROW_H - PANEL_GAP) / 2;
+
 const midBottomH = MIDDLE_ROW_H;
 const midSubW = (centerColW - PANEL_GAP * 2) / 3;
 const midBottomSubH = (midBottomH - PANEL_GAP) / 2;
@@ -80,11 +83,18 @@ export const Layout: LayoutRegions = {
     height: topRowH + PANEL_GAP + MIDDLE_ROW_H,
   },
 
-  alarmLog: {
+  alarm: {
     x: rightX,
     y: topY,
     width: rightColW,
-    height: topRowH + PANEL_GAP + MIDDLE_ROW_H,
+    height: rightSplitH,
+  },
+
+  log: {
+    x: rightX,
+    y: topY + rightSplitH + PANEL_GAP,
+    width: rightColW,
+    height: rightSplitH,
   },
 
   powerSys: {

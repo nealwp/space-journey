@@ -18,15 +18,15 @@ Foundational layer: PixiJS v8 application wrapper, fixed 1280×720 layout, and s
 The core subsystem provides the three foundational modules that all other console components depend on:
 
 - **ConsoleApplication** — Wraps PixiJS v8 `Application` with async initialization, viewport scaling that maintains aspect ratio, and resize handling. Implements `Disposable` for cleanup.
-- **ConsoleLayout** — Defines the fixed 1280×720 virtual resolution and computes `PanelRect` positions for all 11 panel regions (left column, center column, right column, bottom row).
+- **ConsoleLayout** — Defines the fixed 1280×720 virtual resolution and computes `PanelRect` positions for all 12 panel regions (left column, center column, right column, bottom row).
 - **ConsoleTheme** — Single source of truth for all visual constants: colors, spacing, borders, and font sizes. No inline hex literals or pixel sizes allowed elsewhere.
 
 ## Current state
 
-Step 1 complete. All three modules are implemented and working:
+Step 6 complete. All three modules are implemented and working:
 - PixiJS v8 async `Application.init()` with `resizeTo: window`
 - Viewport scaling with `Math.min(vw/1280, vh/720)` and pixel-snap centering
-- 11 panel regions positioned in a three-column grid
+- 12 panel regions positioned in a three-column grid (alarmLog split into alarm + log)
 - Theme colors matching PLAN.md specification
 
 ## Gotchas / non-obvious constraints

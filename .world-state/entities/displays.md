@@ -6,6 +6,8 @@ updated: 2026-08-26
 owner_paths:
   - src/console/displays/ExteriorView.ts
   - src/console/displays/NavigationMap.ts
+  - src/console/displays/AlarmPanel.ts
+  - src/console/displays/LogPanel.ts
 links:
   - core
   - components
@@ -19,15 +21,16 @@ The displays subsystem contains specific instrument displays that compose compon
 
 - **ExteriorView** — Slow-moving starfield camera feed. 20 tiny star pixels drifting horizontally across a dark background. Extends `Container`, has `update(dt)` for animation.
 - **NavigationMap** — Orbital/trajectory plot with dashed grid, ship/destination markers, and range/ETA readouts. Receives data via `setData()`. Refreshes plot every 10 seconds (NAV_REFRESH_MS).
+- **AlarmPanel** — Active alarms only. Per-entry TextStyle with red for ALRM, yellow for WARN. Prefixed with "ALRM " or "WARN ". Receives data via `setData(alarms)`.
+- **LogPanel** — Timestamped history entries. Gray text, `labelSize` (11px), format "HH:MM:SS TEXT". Word-wraps at 22 chars — continuation lines indent to align with message text. Receives data via `setData(logs)`.
 
 ## Current state
 
-Step 5 complete. NavigationMap implemented with:
-- Dark screen background with dashed 20px grid (4px dash, 4px gap)
-- Ship marker (green filled square) and destination marker (yellow hollow square)
-- Trajectory arc connecting ship to destination
-- Range and ETA readouts on solid background at bottom
-- Mock data: ship at 30% x 40%, destination at 75% x 70%, range 2.43M KM, ETA 01:23:33
+Step 6 complete. AlarmPanel and LogPanel implemented with:
+- AlarmPanel: 2 red alarms, 1 yellow warning (mock data), correct per-entry coloring
+- LogPanel: 5 timestamped info entries (mock data), word-wrapped with indented continuations
+- Right column split into two stacked panels: ALRM on top, LOG below
+- Both panels use line-height-based entry rendering with overflow clipping
 
 ## Gotchas / non-obvious constraints
 
@@ -36,4 +39,7 @@ Step 5 complete. NavigationMap implemented with:
 - NavigationDisplayData interface defined in `src/console/data/types.ts` — shared across displays
 - PixiJS v8 does not support dashed lines natively — NavigationMap uses a manual drawDashedLine helper with moveTo/lineTo segments
 - Range/ETA labels have a solid background rect to avoid overlaying the dashed grid
+- AlarmPanel and LogPanel clear and redraw children on each setData() call
+- LogPanel uses MAX_CHARS=22 for word-wrapping — continuation lines indent to align with message text, no timestamp repeat
+- LogPanel uses `labelSize` (11px) instead of `valueSize` (12px) to fit more entries
 - The displays are intentionally crude — no textures, nebulae, planets, or effects
