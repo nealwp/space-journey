@@ -6,6 +6,7 @@ import { CommandTerminal } from "./terminal/CommandTerminal";
 import { TerminalBuffer } from "./terminal/TerminalBuffer";
 import { TerminalInputController } from "./terminal/TerminalInputController";
 import { MockTerminalService } from "./terminal/TerminalService";
+import { ExteriorView } from "./displays/ExteriorView";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
 
@@ -26,6 +27,7 @@ const panelLabels: Record<string, string> = {
 export class CaptainConsole extends Container implements Disposable {
   private panels: Panel[] = [];
   private commandTerminal: CommandTerminal | null = null;
+  private exteriorView: ExteriorView | null = null;
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
@@ -38,6 +40,7 @@ export class CaptainConsole extends Container implements Disposable {
     this.drawChassis();
     this.drawPanels();
     this.initTerminal();
+    this.initExteriorView();
   }
 
   private drawChassis(): void {
@@ -106,8 +109,23 @@ export class CaptainConsole extends Container implements Disposable {
     this.inputController.focus();
   }
 
+  private initExteriorView(): void {
+    const extPanel = this.panels.find(
+      (p) => p.x === Layout.exteriorView.x && p.y === Layout.exteriorView.y
+    );
+    if (!extPanel) return;
+
+    const innerPad = ConsoleTheme.border.inner + 2;
+    const contentWidth = Layout.exteriorView.width - innerPad * 2;
+    const contentHeight = Layout.exteriorView.height - innerPad * 2;
+
+    this.exteriorView = new ExteriorView(contentWidth, contentHeight);
+    extPanel.content.addChild(this.exteriorView);
+  }
+
   update(dt: number): void {
     this.commandTerminal?.update(dt);
+    this.exteriorView?.update(dt);
   }
 
   focusTerminal(): void {
