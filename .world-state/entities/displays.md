@@ -5,6 +5,7 @@ status: current
 updated: 2026-08-26
 owner_paths:
   - src/console/displays/ExteriorView.ts
+  - src/console/displays/NavigationMap.ts
 links:
   - core
   - components
@@ -16,19 +17,23 @@ Specific instrument displays — visual panels that render ship data.
 
 The displays subsystem contains specific instrument displays that compose components from the components subsystem:
 
-- **ExteriorView** — Slow-moving starfield camera feed. 20 tiny star pixels drifting horizontally across a dark background. Labels "EXT VIEW" and "CAM 04". Extends `Container`, has `update(dt)` for animation.
+- **ExteriorView** — Slow-moving starfield camera feed. 20 tiny star pixels drifting horizontally across a dark background. Extends `Container`, has `update(dt)` for animation.
+- **NavigationMap** — Orbital/trajectory plot with dashed grid, ship/destination markers, and range/ETA readouts. Receives data via `setData()`. Refreshes plot every 10 seconds (NAV_REFRESH_MS).
 
 ## Current state
 
-Step 4 complete. ExteriorView implemented with:
-- 20 stars with varying speed (0.1–0.5 px/frame) and brightness (0.3–1.0)
-- Stars wrap when crossing the right edge
-- Dark screen background
-- Labels in top-left corner
+Step 5 complete. NavigationMap implemented with:
+- Dark screen background with dashed 20px grid (4px dash, 4px gap)
+- Ship marker (green filled square) and destination marker (yellow hollow square)
+- Trajectory arc connecting ship to destination
+- Range and ETA readouts on solid background at bottom
+- Mock data: ship at 30% x 40%, destination at 75% x 70%, range 2.43M KM, ETA 01:23:33
 
 ## Gotchas / non-obvious constraints
 
 - ExteriorView.update(dt) must be called each frame for star animation — wired via CaptainConsole.update()
-- Stars are drawn as 1×1px Graphics rects, not sprites
-- Star positions use Math.random() for initial placement — deterministic would require seeded RNG
-- The display is intentionally crude — no textures, nebulae, planets, or effects
+- NavigationMap.setData() is called every 10 seconds for plot refresh — wired via CaptainConsole with setInterval
+- NavigationDisplayData interface defined in `src/console/data/types.ts` — shared across displays
+- PixiJS v8 does not support dashed lines natively — NavigationMap uses a manual drawDashedLine helper with moveTo/lineTo segments
+- Range/ETA labels have a solid background rect to avoid overlaying the dashed grid
+- The displays are intentionally crude — no textures, nebulae, planets, or effects
