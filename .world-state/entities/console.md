@@ -19,17 +19,19 @@ Top-level orchestrator that owns the root container, draws the chassis, and comp
 
 The console subsystem contains:
 
-- **CaptainConsole** — Extends `Container`, implements `Disposable`. Draws the gray industrial chassis (outer + inner rounded rectangles) and composes all 11 panel regions as labeled placeholders using the layout from `ConsoleLayout`. Each panel gets a bezel border, dark screen background, and title label.
+- **CaptainConsole** — Extends `Container`, implements `Disposable`. Draws the gray industrial chassis (outer + inner rounded rectangles) and composes all 12 panel regions as labeled placeholders using the layout from `ConsoleLayout`. Each panel gets a bezel border, dark screen background, and title label.
 - **main.ts** — Bootstrap entry point. Creates `ConsoleApplication`, initializes it, creates `CaptainConsole`, adds it to the root container, and registers cleanup on `beforeunload`.
 
 ## Current state
 
-Step 5 complete. CaptainConsole renders:
+Step 6 complete. CaptainConsole renders:
 - Gray chassis with inner dark border
-- 11 labeled panel placeholders using `Panel` component
+- 12 labeled panel placeholders using `Panel` component (alarmLog split into alarm + log)
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
 - Exterior view in exteriorView panel — 20 drifting stars
 - Navigation map in navMap panel — dashed grid, trajectory arc, ship/destination markers, range/ETA readouts
+- Alarm panel in alarm panel — red/yellow active alarms
+- Log panel in log panel — timestamped history entries
 - All panels positioned by ConsoleLayout
 - Proper cleanup via `destroy()` method
 

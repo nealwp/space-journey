@@ -8,6 +8,8 @@ import { TerminalInputController } from "./terminal/TerminalInputController";
 import { MockTerminalService } from "./terminal/TerminalService";
 import { ExteriorView } from "./displays/ExteriorView";
 import { NavigationMap } from "./displays/NavigationMap";
+import { AlarmPanel } from "./displays/AlarmPanel";
+import { LogPanel } from "./displays/LogPanel";
 import type { NavigationDisplayData } from "./data/types";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
@@ -16,7 +18,8 @@ const panelLabels: Record<string, string> = {
   exteriorView: "EXT VIEW",
   navMap: "NAV",
   mainTerminal: "MAIN TERM",
-  alarmLog: "ALRM / LOG",
+  alarm: "ALRM",
+  log: "LOG",
   alarmMatrix: "ALRM MATRIX",
   powerSys: "PWR SYS",
   propulsionSys: "PROP SYS",
@@ -31,6 +34,8 @@ export class CaptainConsole extends Container implements Disposable {
   private commandTerminal: CommandTerminal | null = null;
   private exteriorView: ExteriorView | null = null;
   private navigationMap: NavigationMap | null = null;
+  private alarmPanel: AlarmPanel | null = null;
+  private logPanel: LogPanel | null = null;
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
@@ -45,6 +50,8 @@ export class CaptainConsole extends Container implements Disposable {
     this.initTerminal();
     this.initExteriorView();
     this.initNavigationMap();
+    this.initAlarmPanel();
+    this.initLogPanel();
   }
 
   private drawChassis(): void {
@@ -156,6 +163,48 @@ export class CaptainConsole extends Container implements Disposable {
         { x: contentWidth * 0.75, y: contentHeight * 0.7 },
       ],
     });
+  }
+
+  private initAlarmPanel(): void {
+    const alarmPanelEl = this.panels.find(
+      (p) => p.x === Layout.alarm.x && p.y === Layout.alarm.y
+    );
+    if (!alarmPanelEl) return;
+
+    const innerPad = ConsoleTheme.border.inner + 2;
+    const contentWidth = Layout.alarm.width - innerPad * 2;
+    const contentHeight = Layout.alarm.height - innerPad * 2;
+
+    this.alarmPanel = new AlarmPanel(contentWidth, contentHeight);
+    alarmPanelEl.content.addChild(this.alarmPanel);
+
+    this.alarmPanel.setData([
+      { id: "a1", severity: "alarm", text: "PWR DIST B" },
+      { id: "a2", severity: "alarm", text: "COOL LOOP B TEMP" },
+      { id: "w1", severity: "warning", text: "H20 LVL LOW" },
+    ]);
+  }
+
+  private initLogPanel(): void {
+    const logPanelEl = this.panels.find(
+      (p) => p.x === Layout.log.x && p.y === Layout.log.y
+    );
+    if (!logPanelEl) return;
+
+    const innerPad = ConsoleTheme.border.inner + 2;
+    const contentWidth = Layout.log.width - innerPad * 2;
+    const contentHeight = Layout.log.height - innerPad * 2;
+
+    this.logPanel = new LogPanel(contentWidth, contentHeight);
+    logPanelEl.content.addChild(this.logPanel);
+
+    this.logPanel.setData([
+      { id: "l1", timestamp: "10:13:02", text: "NAV SOL UPDT" },
+      { id: "l2", timestamp: "10:15:47", text: "PWR DIST B VOLT FLUC" },
+      { id: "l3", timestamp: "10:16:12", text: "COOL LOOP B TEMP HIGH" },
+      { id: "l4", timestamp: "10:18:33", text: "COMM LINK OK" },
+      { id: "l5", timestamp: "10:20:01", text: "FUEL CELLS NOMINAL" },
+    ]);
   }
 
   update(dt: number): void {
