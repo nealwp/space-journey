@@ -55,7 +55,7 @@ const LOG_POOL: { text: string; severity: "info" | "warning" }[] = [
 ];
 
 function getNavContentDimensions(): { w: number; h: number } {
-  const innerPad = ConsoleTheme.border.inner + 2;
+  const innerPad = ConsoleTheme.contentPad;
   return {
     w: Layout.navMap.width - innerPad * 2,
     h: Layout.navMap.height - innerPad * 2,

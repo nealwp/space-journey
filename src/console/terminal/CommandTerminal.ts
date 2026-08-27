@@ -73,7 +73,7 @@ export class CommandTerminal extends Container {
 
   update(dt: number): void {
     this.elapsed += dt;
-    const visible = Math.floor(this.elapsed / 500) % 2 === 0;
+    const visible = Math.floor(this.elapsed / ConsoleTheme.blinkIntervalMs) % 2 === 0;
     this.cursorText.visible = visible && !this.busy;
   }
 

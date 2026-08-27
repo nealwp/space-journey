@@ -8,6 +8,14 @@ export function formatRangeKm(km: number): string {
   return `${km} KM`;
 }
 
+export function formatPercent(n: number): string {
+  return `${Math.round(n)}%`;
+}
+
+export function formatTemperature(n: number): string {
+  return `${n.toFixed(1)}C`;
+}
+
 export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);

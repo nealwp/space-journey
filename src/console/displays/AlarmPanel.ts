@@ -40,7 +40,7 @@ export class AlarmPanel extends Container {
           fontFamily: ConsoleTheme.font.family,
           fontSize: ConsoleTheme.font.valueSize,
           fill: color,
-          letterSpacing: 1,
+          letterSpacing: ConsoleTheme.font.letterSpacing,
         }),
       });
       label.x = ConsoleTheme.spacing.sm;

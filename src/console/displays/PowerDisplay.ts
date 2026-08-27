@@ -1,21 +1,12 @@
-import { Container, Text, TextStyle } from "pixi.js";
+import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-import type { TelemetryColor } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
-import type { PowerTelemetry, SystemStatus } from "../data/types";
+import type { PowerTelemetry } from "../data/types";
+import { formatPercent } from "../utils/formatting";
+import { formatStatus, statusColor } from "../utils/status";
+import { measureLabelWidth } from "../utils/measureLabelWidth";
 
 const LABELS = ["GEN A", "GEN B", "RESRV", "STAT"];
-
-function measureLabelWidth(label: string): number {
-  const style = new TextStyle({
-    fontFamily: ConsoleTheme.font.family,
-    fontSize: ConsoleTheme.font.valueSize,
-    letterSpacing: 1,
-  });
-  const t = new Text({ text: label, style });
-  return t.width;
-}
-
 const maxLabelWidth = Math.max(...LABELS.map(measureLabelWidth));
 
 export class PowerDisplay extends Container {
@@ -47,30 +38,10 @@ export class PowerDisplay extends Container {
   }
 
   setData(data: PowerTelemetry): void {
-    this.genA.setValue(`${data.generatorA}%`);
-    this.genB.setValue(`${data.generatorB}%`);
-    this.reserve.setValue(`${data.reserve}%`);
+    this.genA.setValue(formatPercent(data.generatorA));
+    this.genB.setValue(formatPercent(data.generatorB));
+    this.reserve.setValue(formatPercent(data.reserve));
     this.status.setValue(formatStatus(data.status));
     this.status.setColor(statusColor(data.status));
-  }
-}
-
-function formatStatus(s: SystemStatus): string {
-  switch (s) {
-    case "nominal": return "NOM";
-    case "degraded": return "DEG";
-    case "warning": return "WARN";
-    case "critical": return "CRIT";
-    case "offline": return "OFF";
-  }
-}
-
-function statusColor(s: SystemStatus): TelemetryColor {
-  switch (s) {
-    case "nominal": return ConsoleTheme.colors.green;
-    case "degraded": return ConsoleTheme.colors.yellow;
-    case "warning": return ConsoleTheme.colors.yellow;
-    case "critical": return ConsoleTheme.colors.red;
-    case "offline": return ConsoleTheme.colors.red;
   }
 }

@@ -142,7 +142,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!terminalPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.mainTerminal.width - innerPad * 2;
     const contentHeight = Layout.mainTerminal.height - innerPad * 2;
 
@@ -170,7 +170,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!extPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.exteriorView.width - innerPad * 2;
     const contentHeight = Layout.exteriorView.height - innerPad * 2;
 
@@ -184,7 +184,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!navPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.navMap.width - innerPad * 2;
     const contentHeight = Layout.navMap.height - innerPad * 2;
 
@@ -198,7 +198,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!alarmPanelEl) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.alarm.width - innerPad * 2;
     const contentHeight = Layout.alarm.height - innerPad * 2;
 
@@ -212,7 +212,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!logPanelEl) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.log.width - innerPad * 2;
     const contentHeight = Layout.log.height - innerPad * 2;
 
@@ -276,7 +276,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!panel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
     const contentWidth = Layout.alarmMatrix.width - innerPad * 2;
 
     this.alarmMatrix = new AlarmMatrix(contentWidth);

@@ -2,7 +2,7 @@
 id: terminal
 type: entity
 status: current
-updated: 2026-08-26
+updated: 2026-08-27
 owner_paths:
   - src/console/terminal/CommandTerminal.ts
   - src/console/terminal/TerminalBuffer.ts
@@ -36,6 +36,7 @@ Step 3 complete. Terminal renders in the mainTerminal panel with:
 ## Gotchas / non-obvious constraints
 
 - CommandTerminal.update(dt) must be called each frame for cursor blinking — wired via ticker in main.ts
+- CommandTerminal uses `ConsoleTheme.blinkIntervalMs` for cursor blink timing
 - TerminalInputController is positioned offscreen, not hidden via display:none — DOM input must remain focusable
 - Text wrapping uses TextStyle.wordWrap — estimateTextHeight() approximates line count for positioning
 - CaptainConsole owns the submission flow — CommandTerminal never calls TerminalService directly

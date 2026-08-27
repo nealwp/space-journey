@@ -70,7 +70,7 @@ export class LogPanel extends Container {
           fontFamily: ConsoleTheme.font.family,
           fontSize: ConsoleTheme.font.labelSize,
           fill: ConsoleTheme.colors.text,
-          letterSpacing: 1,
+          letterSpacing: ConsoleTheme.font.letterSpacing,
         }),
       });
       label.x = ConsoleTheme.spacing.sm;

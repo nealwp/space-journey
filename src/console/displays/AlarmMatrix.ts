@@ -4,7 +4,7 @@ import { StatusIndicator } from "../components/StatusIndicator";
 import type { AlarmMatrixData, AlarmMatrixRow, IndicatorState } from "../data/types";
 import type { Disposable } from "../core/ConsoleApplication";
 
-const INDICATOR_SIZE = 6;
+
 
 export class AlarmMatrix extends Container implements Disposable {
   private matrixWidth: number;
@@ -23,7 +23,7 @@ export class AlarmMatrix extends Container implements Disposable {
       fontFamily: ConsoleTheme.font.family,
       fontSize: ConsoleTheme.font.titleSize,
       fill: ConsoleTheme.colors.textDim,
-      letterSpacing: 1,
+      letterSpacing: ConsoleTheme.font.letterSpacing,
     });
   }
 
@@ -31,7 +31,7 @@ export class AlarmMatrix extends Container implements Disposable {
     this.clearRow(this.rowA, this.rowALabels);
     this.clearRow(this.rowB, this.rowBLabels);
 
-    const rowHeight = ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs + INDICATOR_SIZE + ConsoleTheme.spacing.sm;
+    const rowHeight = ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs + ConsoleTheme.indicatorSize + ConsoleTheme.spacing.sm;
 
     const { indicators: rowA, labels: rowALabels } = this.buildRow(data.rowA, 0);
     const { indicators: rowB, labels: rowBLabels } = this.buildRow(data.rowB, rowHeight);
@@ -70,8 +70,8 @@ export class AlarmMatrix extends Container implements Disposable {
       this.addChild(label);
       labels.push(label);
 
-      const ind = new StatusIndicator(INDICATOR_SIZE);
-      ind.x = x + (colWidth - INDICATOR_SIZE) / 2;
+      const ind = new StatusIndicator(ConsoleTheme.indicatorSize);
+      ind.x = x + (colWidth - ConsoleTheme.indicatorSize) / 2;
       ind.y = indicatorY;
       ind.setState(row.states[i]);
       this.addChild(ind);

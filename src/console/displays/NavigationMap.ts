@@ -2,6 +2,7 @@ import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import type { NavigationDisplayData } from "../data/types";
 import { formatRangeKm, formatDuration } from "../utils/formatting";
+import { drawDashedLine } from "../rendering/primitives";
 
 const NAV_REFRESH_MS = 10_000;
 
@@ -17,7 +18,8 @@ export class NavigationMap extends Container {
   private viewWidth: number;
   private viewHeight: number;
 
-  private lastUpdateTime = 0;
+  private lastPlotTime = 0;
+  private pendingData: NavigationDisplayData | null = null;
 
   constructor(width: number, height: number) {
     super();
@@ -48,6 +50,7 @@ export class NavigationMap extends Container {
       fontFamily: ConsoleTheme.font.family,
       fontSize: ConsoleTheme.font.valueSize,
       fill: ConsoleTheme.colors.textDim,
+      letterSpacing: ConsoleTheme.font.letterSpacing,
     });
 
     this.rangeLabel = new Text({ text: "RNG ---", style: labelStyle });
@@ -62,10 +65,22 @@ export class NavigationMap extends Container {
 
     this.drawBackground();
     this.drawGrid();
-    this.drawLabels();
   }
 
   setData(data: NavigationDisplayData): void {
+    this.pendingData = data;
+
+    this.rangeLabel.text = `RNG ${formatRangeKm(data.rangeKm)}`;
+    this.etaLabel.text = `ETA ${formatDuration(data.etaSeconds)}`;
+
+    const now = performance.now();
+    if (now - this.lastPlotTime >= NAV_REFRESH_MS) {
+      this.redrawPlot(data);
+      this.lastPlotTime = now;
+    }
+  }
+
+  private redrawPlot(data: NavigationDisplayData): void {
     this.plotGraphics.clear();
     this.markersGraphics.clear();
 
@@ -86,9 +101,6 @@ export class NavigationMap extends Container {
     this.markersGraphics
       .rect(data.destinationX - destSize / 2, data.destinationY - destSize / 2, destSize, destSize)
       .stroke({ color: ConsoleTheme.colors.yellow, width: 1 });
-
-    this.rangeLabel.text = `RNG ${formatRangeKm(data.rangeKm)}`;
-    this.etaLabel.text = `ETA ${formatDuration(data.etaSeconds)}`;
   }
 
   private drawBackground(): void {
@@ -101,45 +113,11 @@ export class NavigationMap extends Container {
     const spacing = 20;
 
     for (let x = spacing; x < this.viewWidth; x += spacing) {
-      this.drawDashedLine(this.gridGraphics, x, 0, x, this.viewHeight);
+      drawDashedLine(this.gridGraphics, x, 0, x, this.viewHeight);
     }
 
     for (let y = spacing; y < this.viewHeight; y += spacing) {
-      this.drawDashedLine(this.gridGraphics, 0, y, this.viewWidth, y);
+      drawDashedLine(this.gridGraphics, 0, y, this.viewWidth, y);
     }
-  }
-
-  private drawDashedLine(g: Graphics, x1: number, y1: number, x2: number, y2: number): void {
-    const dash = 4;
-    const gap = 4;
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    if (len === 0) return;
-
-    const ux = dx / len;
-    const uy = dy / len;
-    let dist = 0;
-    let drawing = true;
-
-    while (dist < len) {
-      const segLen = Math.min(dash, len - dist);
-      const sx = x1 + ux * dist;
-      const sy = y1 + uy * dist;
-      const ex = x1 + ux * (dist + segLen);
-      const ey = y1 + uy * (dist + segLen);
-
-      if (drawing) {
-        g.moveTo(sx, sy).lineTo(ex, ey);
-      }
-
-      dist += segLen;
-      drawing = !drawing;
-    }
-
-    g.stroke({ color: ConsoleTheme.colors.grid, width: 1 });
-  }
-
-  private drawLabels(): void {
   }
 }
