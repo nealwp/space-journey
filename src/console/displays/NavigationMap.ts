@@ -1,6 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import type { NavigationDisplayData } from "../data/types";
+import { formatRangeKm, formatDuration } from "../utils/formatting";
 
 const NAV_REFRESH_MS = 10_000;
 
@@ -141,21 +142,4 @@ export class NavigationMap extends Container {
 
   private drawLabels(): void {
   }
-}
-
-function formatRangeKm(km: number): string {
-  if (km >= 1_000_000) {
-    return `${(km / 1_000_000).toFixed(2)}M KM`;
-  }
-  if (km >= 1_000) {
-    return `${(km / 1_000).toFixed(1)}K KM`;
-  }
-  return `${km} KM`;
-}
-
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }

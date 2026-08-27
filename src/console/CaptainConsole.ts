@@ -15,6 +15,8 @@ import { PropulsionDisplay } from "./displays/PropulsionDisplay";
 import { LifeSupportDisplay } from "./displays/LifeSupportDisplay";
 import { PowerDistributionDisplay } from "./displays/PowerDistributionDisplay";
 import { GravityEnvironmentDisplay } from "./displays/GravityEnvironmentDisplay";
+import { AlarmMatrix } from "./displays/AlarmMatrix";
+import { SystemSummary } from "./displays/SystemSummary";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
 
@@ -45,6 +47,8 @@ export class CaptainConsole extends Container implements Disposable {
   private lifeSupportDisplay: LifeSupportDisplay | null = null;
   private powerDistDisplay: PowerDistributionDisplay | null = null;
   private gravEnvDisplay: GravityEnvironmentDisplay | null = null;
+  private alarmMatrix: AlarmMatrix | null = null;
+  private systemSummary: SystemSummary | null = null;
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
@@ -66,6 +70,8 @@ export class CaptainConsole extends Container implements Disposable {
     this.initLifeSupportDisplay();
     this.initPowerDistDisplay();
     this.initGravEnvDisplay();
+    this.initAlarmMatrix();
+    this.initSystemSummary();
   }
 
   private drawChassis(): void {
@@ -301,9 +307,51 @@ export class CaptainConsole extends Container implements Disposable {
     });
   }
 
+  private initAlarmMatrix(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.alarmMatrix.x && p.y === Layout.alarmMatrix.y
+    );
+    if (!panel) return;
+
+    const innerPad = ConsoleTheme.border.inner + 2;
+    const contentWidth = Layout.alarmMatrix.width - innerPad * 2;
+
+    this.alarmMatrix = new AlarmMatrix(contentWidth);
+    panel.content.addChild(this.alarmMatrix);
+
+    this.alarmMatrix.setData({
+      rowA: {
+        labels: ["PWR", "PROP", "LIFE", "NAV", "COMM"],
+        states: ["nominal", "nominal", "warning", "nominal", "alarm"],
+      },
+      rowB: {
+        labels: ["COOL", "FUEL", "O2", "DCLK", "AUX"],
+        states: ["nominal", "alarm", "nominal", "warning", "nominal"],
+      },
+    });
+  }
+
+  private initSystemSummary(): void {
+    const panel = this.panels.find(
+      (p) => p.x === Layout.systemSummary.x && p.y === Layout.systemSummary.y
+    );
+    if (!panel) return;
+
+    this.systemSummary = new SystemSummary();
+    panel.content.addChild(this.systemSummary);
+
+    this.systemSummary.setData({
+      missionId: "VOY-2847",
+      destination: "STATION EREBUS",
+      elapsed: 2533,
+      rangeKm: 2_426_812,
+    });
+  }
+
   update(dt: number): void {
     this.commandTerminal?.update(dt);
     this.exteriorView?.update(dt);
+    this.alarmMatrix?.update(dt);
   }
 
   focusTerminal(): void {

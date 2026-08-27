@@ -13,6 +13,8 @@ owner_paths:
   - src/console/displays/LifeSupportDisplay.ts
   - src/console/displays/PowerDistributionDisplay.ts
   - src/console/displays/GravityEnvironmentDisplay.ts
+  - src/console/displays/AlarmMatrix.ts
+  - src/console/displays/SystemSummary.ts
 links:
   - core
   - components
@@ -33,18 +35,23 @@ The displays subsystem contains specific instrument displays that compose compon
 - **LifeSupportDisplay** — O2, CO2, temperature, humidity. Uses TelemetryText.
 - **PowerDistributionDisplay** — Grid status only. Uses TelemetryText.
 - **GravityEnvironmentDisplay** — G-force, radiation, temperature. Uses TelemetryText.
+- **AlarmMatrix** — 2×5 grid of tiny StatusIndicator lights for PWR, PROP, LIFE, NAV, COMM. Column labels above each indicator. Supports blinking alarm states via `update(dt)`.
+- **SystemSummary** — Compact bottom status strip. Single horizontal line: mission ID, destination, elapsed time, range.
 
 ## Current state
 
-Step 7 complete. All 5 lower telemetry panels implemented:
+Step 8 complete. All panels implemented:
 - PowerDisplay: GEN A 98%, GEN B 97%, RESRV 11%, STAT NOM
 - PropulsionDisplay: THRUST 75%, FUEL 62%, DRIVE NOM
 - LifeSupportDisplay: O2 21%, CO2 0.04%, TEMP 22.4C, HUMID 45%
 - PowerDistributionDisplay: GRID NOM
 - GravityEnvironmentDisplay: G-FORCE 1.00, RAD 0.12 mSv, TEMP 21.8C
+- AlarmMatrix: PWR NOM, PROP NOM, LIFE WARN, NAV NOM, COMM ALRM (blinking)
+- SystemSummary: VOY-2847 | STATION EREBUS | 00:42:13 | 2.43M KM
 - All panels use TelemetryText components with mock data via setData()
 - TelemetryText renders label and value horizontally (same line)
 - Each display computes maxLabelWidth and passes it to TelemetryText for aligned value columns
+- Formatting utilities extracted to `src/console/utils/formatting.ts`
 
 ## Gotchas / non-obvious constraints
 
@@ -59,4 +66,6 @@ Step 7 complete. All 5 lower telemetry panels implemented:
 - All 5 lower telemetry displays use TelemetryText for label/value pairs
 - Status colors (green/yellow/red) mapped from SystemStatus via TelemetryColor type
 - TelemetryText accepts optional `labelWidth` to align values across instances — each display measures longest label
+- AlarmMatrix uses StatusIndicator component — update(dt) must be called each frame for blink
+- SystemSummary uses formatRangeKm and formatDuration from shared utils
 - The displays are intentionally crude — no textures, nebulae, planets, or effects
