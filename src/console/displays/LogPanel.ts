@@ -45,7 +45,9 @@ export class LogPanel extends Container {
       }
     }
 
-    const visible = lines.slice(0, maxVisible);
+    const visible = lines.length > maxVisible
+      ? lines.slice(lines.length - maxVisible)
+      : lines;
 
     for (let i = 0; i < visible.length; i++) {
       const line = visible[i];
