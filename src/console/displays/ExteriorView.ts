@@ -83,7 +83,7 @@ export class ExteriorView extends Container {
       fontFamily: ConsoleTheme.font.family,
       fontSize: ConsoleTheme.font.titleSize,
       fill: ConsoleTheme.colors.textDim,
-      letterSpacing: 1,
+      letterSpacing: ConsoleTheme.font.letterSpacing,
     });
 
     const camLabel = new Text({ text: "CAM 04", style });

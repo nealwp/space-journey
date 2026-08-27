@@ -20,7 +20,7 @@ export class TelemetryText extends Container {
       fontFamily: ConsoleTheme.font.family,
       fontSize: ConsoleTheme.font.valueSize,
       fill: ConsoleTheme.colors.textDim,
-      letterSpacing: 1,
+      letterSpacing: ConsoleTheme.font.letterSpacing,
     });
 
     this.labelText = new Text({ text: options.label ?? "", style: labelStyle });
@@ -31,7 +31,7 @@ export class TelemetryText extends Container {
       fontFamily: ConsoleTheme.font.family,
       fontSize: ConsoleTheme.font.valueSize,
       fill: options.color ?? ConsoleTheme.colors.text,
-      letterSpacing: 1,
+      letterSpacing: ConsoleTheme.font.letterSpacing,
     });
 
     this.valueText = new Text({ text: options.value ?? "", style: valueStyle });

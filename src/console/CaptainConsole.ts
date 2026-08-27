@@ -22,13 +22,23 @@ import type { Disposable } from "./core/ConsoleApplication";
 import type { ConsoleDataSource } from "./data/ConsoleDataSource";
 import type { ConsoleSnapshot } from "./data/ConsoleSnapshot";
 
+const TITLE_OFFSET = ConsoleTheme.spacing.xs + ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs;
+
+function titledContentHeight(panelHeight: number): number {
+  return panelHeight - ConsoleTheme.contentPad - TITLE_OFFSET;
+}
+
+function titledContentWidth(panelWidth: number): number {
+  return panelWidth - ConsoleTheme.contentPad * 2;
+}
+
 const panelLabels: Record<string, string> = {
   exteriorView: "EXT VIEW",
   navMap: "NAV",
   mainTerminal: "MAIN TERM",
   alarm: "ALRM",
   log: "LOG",
-  alarmMatrix: "ALRM MATRIX",
+  alarmMatrix: "ALRM MTX",
   powerSys: "PWR SYS",
   propulsionSys: "PROP SYS",
   lifeSupport: "LIFE SUPP",
@@ -142,9 +152,8 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!terminalPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.mainTerminal.width - innerPad * 2;
-    const contentHeight = Layout.mainTerminal.height - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.mainTerminal.width);
+    const contentHeight = titledContentHeight(Layout.mainTerminal.height);
 
     this.commandTerminal = new CommandTerminal(contentWidth, contentHeight);
     terminalPanel.content.addChild(this.commandTerminal);
@@ -170,9 +179,8 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!extPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.exteriorView.width - innerPad * 2;
-    const contentHeight = Layout.exteriorView.height - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.exteriorView.width);
+    const contentHeight = titledContentHeight(Layout.exteriorView.height);
 
     this.exteriorView = new ExteriorView(contentWidth, contentHeight);
     extPanel.content.addChild(this.exteriorView);
@@ -184,9 +192,8 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!navPanel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.navMap.width - innerPad * 2;
-    const contentHeight = Layout.navMap.height - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.navMap.width);
+    const contentHeight = titledContentHeight(Layout.navMap.height);
 
     this.navigationMap = new NavigationMap(contentWidth, contentHeight);
     navPanel.content.addChild(this.navigationMap);
@@ -198,9 +205,8 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!alarmPanelEl) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.alarm.width - innerPad * 2;
-    const contentHeight = Layout.alarm.height - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.alarm.width);
+    const contentHeight = titledContentHeight(Layout.alarm.height);
 
     this.alarmPanel = new AlarmPanel(contentWidth, contentHeight);
     alarmPanelEl.content.addChild(this.alarmPanel);
@@ -212,9 +218,8 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!logPanelEl) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.log.width - innerPad * 2;
-    const contentHeight = Layout.log.height - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.log.width);
+    const contentHeight = titledContentHeight(Layout.log.height);
 
     this.logPanel = new LogPanel(contentWidth, contentHeight);
     logPanelEl.content.addChild(this.logPanel);
@@ -276,8 +281,7 @@ export class CaptainConsole extends Container implements Disposable {
     );
     if (!panel) return;
 
-    const innerPad = ConsoleTheme.border.inner + 2;
-    const contentWidth = Layout.alarmMatrix.width - innerPad * 2;
+    const contentWidth = titledContentWidth(Layout.alarmMatrix.width);
 
     this.alarmMatrix = new AlarmMatrix(contentWidth);
     panel.content.addChild(this.alarmMatrix);
@@ -297,6 +301,8 @@ export class CaptainConsole extends Container implements Disposable {
     this.commandTerminal?.update(dt);
     this.exteriorView?.update(dt);
     this.alarmMatrix?.update(dt);
+    this.logPanel?.update(dt);
+    this.alarmPanel?.update(dt);
   }
 
   focusTerminal(): void {
@@ -333,6 +339,10 @@ export class CaptainConsole extends Container implements Disposable {
       };
       this.terminalBuffer.addLine(computerLine);
       this.commandTerminal?.setLines(this.terminalBuffer.getLines());
+
+      await new Promise<void>((resolve) => {
+        this.commandTerminal?.startTyping(computerLine.id, response, resolve);
+      });
     } finally {
       this.busy = false;
       this.commandTerminal?.setBusy(false);
