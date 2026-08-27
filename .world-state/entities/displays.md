@@ -35,7 +35,7 @@ The displays subsystem contains specific instrument displays that compose compon
 - **LifeSupportDisplay** — O2, CO2, temperature, humidity. Uses TelemetryText.
 - **PowerDistributionDisplay** — Grid status only. Uses TelemetryText.
 - **GravityEnvironmentDisplay** — G-force, radiation, temperature. Uses TelemetryText.
-- **AlarmMatrix** — 2×5 grid of tiny StatusIndicator lights for PWR, PROP, LIFE, NAV, COMM. Column labels above each indicator. Supports blinking alarm states via `update(dt)`.
+- **AlarmMatrix** — 2-row × 5-column grid of tiny StatusIndicator lights. Each row has custom labels and independent states via `setData()`. Row A: PWR, PROP, LIFE, NAV, COMM. Row B: COOL, FUEL, O2, DCLK, AUX. Supports blinking alarm states via `update(dt)`.
 - **SystemSummary** — Compact bottom status strip. Single horizontal line: mission ID, destination, elapsed time, range.
 
 ## Current state
@@ -46,7 +46,7 @@ Step 8 complete. All panels implemented:
 - LifeSupportDisplay: O2 21%, CO2 0.04%, TEMP 22.4C, HUMID 45%
 - PowerDistributionDisplay: GRID NOM
 - GravityEnvironmentDisplay: G-FORCE 1.00, RAD 0.12 mSv, TEMP 21.8C
-- AlarmMatrix: PWR NOM, PROP NOM, LIFE WARN, NAV NOM, COMM ALRM (blinking)
+- AlarmMatrix: Row A — PWR NOM, PROP NOM, LIFE WARN, NAV NOM, COMM ALRM; Row B — COOL NOM, FUEL ALRM, O2 NOM, DCLK WARN, AUX NOM (blinking)
 - SystemSummary: VOY-2847 | STATION EREBUS | 00:42:13 | 2.43M KM
 - All panels use TelemetryText components with mock data via setData()
 - TelemetryText renders label and value horizontally (same line)
@@ -67,5 +67,7 @@ Step 8 complete. All panels implemented:
 - Status colors (green/yellow/red) mapped from SystemStatus via TelemetryColor type
 - TelemetryText accepts optional `labelWidth` to align values across instances — each display measures longest label
 - AlarmMatrix uses StatusIndicator component — update(dt) must be called each frame for blink
+- AlarmMatrix accepts AlarmMatrixData with rowA/rowB, each containing labels[] and states[]
+- AlarmMatrix rebuilds rows on setData() — clears and recreates all children
 - SystemSummary uses formatRangeKm and formatDuration from shared utils
 - The displays are intentionally crude — no textures, nebulae, planets, or effects

@@ -37,7 +37,7 @@ Step 8 complete. CaptainConsole renders:
 - Life support panel — O2, CO2, TEMP, HUMID
 - Power dist panel — GRID status
 - Grav/env panel — G-FORCE, RAD, TEMP
-- Alarm matrix — 2×5 grid of status lights (PWR, PROP, LIFE, NAV, COMM)
+- Alarm matrix — 2×5 grid of status lights (Row A: PWR, PROP, LIFE, NAV, COMM; Row B: COOL, FUEL, O2, DCLK, AUX)
 - System summary — mission ID, destination, elapsed time, range
 - All panels positioned by ConsoleLayout
 - Proper cleanup via `destroy()` method
