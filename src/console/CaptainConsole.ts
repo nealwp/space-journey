@@ -333,6 +333,10 @@ export class CaptainConsole extends Container implements Disposable {
       };
       this.terminalBuffer.addLine(computerLine);
       this.commandTerminal?.setLines(this.terminalBuffer.getLines());
+
+      await new Promise<void>((resolve) => {
+        this.commandTerminal?.startTyping(computerLine.id, response, resolve);
+      });
     } finally {
       this.busy = false;
       this.commandTerminal?.setBusy(false);

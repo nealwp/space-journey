@@ -2,6 +2,8 @@ import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import type { TerminalLine } from "./TerminalBuffer";
 
+const CHARS_PER_SECOND = 40;
+
 export class CommandTerminal extends Container {
   private linesContainer: Container;
   private cursorText: Text;
@@ -16,6 +18,12 @@ export class CommandTerminal extends Container {
   private lineWidth: number;
   private lineHeight: number;
   private availableHeight: number;
+
+  private typingLineId: string | null = null;
+  private typingFullText = "";
+  private typingIndex = 0;
+  private typingTimer = 0;
+  private onTypeComplete: (() => void) | null = null;
 
   constructor(width: number, height: number) {
     super();
@@ -63,6 +71,20 @@ export class CommandTerminal extends Container {
     this.rebuildLines();
   }
 
+  startTyping(lineId: string, fullText: string, onComplete: () => void): void {
+    this.typingLineId = lineId;
+    this.typingFullText = fullText;
+    this.typingIndex = 0;
+    this.typingTimer = 0;
+    this.onTypeComplete = onComplete;
+
+    const line = this.currentLines.find((l) => l.id === lineId);
+    if (line) {
+      line.text = "";
+    }
+    this.rebuildLines();
+  }
+
   setInput(value: string): void {
     this.currentInput = value;
     this.inputValue.text = value;
@@ -77,6 +99,27 @@ export class CommandTerminal extends Container {
     this.elapsed += dt;
     const visible = Math.floor(this.elapsed / ConsoleTheme.blinkIntervalMs) % 2 === 0;
     this.cursorText.visible = visible && !this.busy;
+
+    if (this.typingLineId !== null) {
+      this.typingTimer += dt;
+      const charsToShow = Math.floor(this.typingTimer / (1000 / CHARS_PER_SECOND));
+
+      if (charsToShow > this.typingIndex) {
+        this.typingIndex = Math.min(charsToShow, this.typingFullText.length);
+
+        const line = this.currentLines.find((l) => l.id === this.typingLineId);
+        if (line) {
+          line.text = this.typingFullText.substring(0, this.typingIndex);
+        }
+        this.rebuildLines();
+      }
+
+      if (this.typingIndex >= this.typingFullText.length) {
+        this.typingLineId = null;
+        this.onTypeComplete?.();
+        this.onTypeComplete = null;
+      }
+    }
   }
 
   private rebuildLines(): void {
@@ -107,9 +150,9 @@ export class CommandTerminal extends Container {
         prefix = "> ";
       }
 
-      const lineStyle = line.type === "system"
-        ? dimStyle
-        : baseStyle;
+      const lineStyle = line.type === "captain"
+        ? baseStyle
+        : dimStyle;
 
       const text = new Text({ text: prefix + line.text, style: lineStyle });
       text.y = y;
