@@ -72,6 +72,6 @@ Step 9 complete. All panels implemented:
 - TelemetryText accepts optional `labelWidth` to align values across instances — each display measures longest label
 - AlarmMatrix uses StatusIndicator component — update(dt) must be called each frame for blink
 - AlarmMatrix accepts AlarmMatrixData with rowA/rowB, each containing labels[] and states[]
-- AlarmMatrix rebuilds rows on setData() — clears and recreates all children
+- AlarmMatrix rebuilds rows on setData() — clears and recreates all children (labels + indicators)
 - SystemSummary uses formatRangeKm and formatDuration from shared utils
 - The displays are intentionally crude — no textures, nebulae, planets, or effects

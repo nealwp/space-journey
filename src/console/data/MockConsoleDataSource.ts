@@ -95,6 +95,8 @@ export class MockConsoleDataSource implements ConsoleDataSource {
   private interval: ReturnType<typeof setInterval> | null = null;
   private tickCount = 0;
   private latestSnapshot: ConsoleSnapshot;
+  private logs: LogEntry[] = [...INITIAL_LOGS];
+  private logIndex = 0;
 
   constructor() {
     this.latestSnapshot = this.generateSnapshot(0);
@@ -227,15 +229,15 @@ export class MockConsoleDataSource implements ConsoleDataSource {
       activeAlarms.push({ id: `w-${t}`, severity: "warning", text: "NAV SIG DRIFT" });
     }
 
-    const logs: LogEntry[] = [...INITIAL_LOGS];
     const logInterval = 12;
     if (t > 0 && t % logInterval === 0) {
-      const poolEntry = LOG_POOL[Math.floor(t / logInterval) % LOG_POOL.length];
-      logs.push({
+      const poolEntry = LOG_POOL[this.logIndex % LOG_POOL.length];
+      this.logs.push({
         id: `log-${t}`,
         timestamp: formatTimestamp(t),
         text: poolEntry.text,
       });
+      this.logIndex++;
     }
 
     const mission: MissionTelemetry = {
@@ -255,7 +257,7 @@ export class MockConsoleDataSource implements ConsoleDataSource {
       environment,
       alarmMatrix,
       activeAlarms,
-      logs,
+      logs: this.logs,
       mission,
     };
   }
