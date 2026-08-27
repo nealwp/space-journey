@@ -3,11 +3,18 @@ import { ConsoleTheme } from "../core/ConsoleTheme";
 import type { LogEntry } from "../data/types";
 
 const MAX_CHARS = 22;
+const CHARS_PER_SECOND = 40;
 
 export class LogPanel extends Container {
   private viewWidth: number;
   private viewHeight: number;
   private entries: LogEntry[] = [];
+  private knownIds = new Set<string>();
+
+  private typingEntryId: string | null = null;
+  private typingCharIndex = 0;
+  private typingTimer = 0;
+  private typingQueue: string[] = [];
 
   constructor(width: number, height: number) {
     super();
@@ -17,8 +24,52 @@ export class LogPanel extends Container {
   }
 
   setData(logs: LogEntry[]): void {
+    const prevIds = this.knownIds;
+
+    for (const entry of logs) {
+      if (!prevIds.has(entry.id)) {
+        this.knownIds.add(entry.id);
+        this.typingQueue.push(entry.id);
+      }
+    }
+
     this.entries = logs;
+
+    if (this.typingEntryId === null && this.typingQueue.length > 0) {
+      this.startNextTyping();
+    }
+
     this.drawEntries();
+  }
+
+  update(dt: number): void {
+    if (this.typingEntryId === null) return;
+
+    this.typingTimer += dt;
+    const charsToShow = Math.floor(this.typingTimer / (1000 / CHARS_PER_SECOND));
+
+    const entry = this.entries.find((e) => e.id === this.typingEntryId);
+    if (entry && charsToShow > this.typingCharIndex) {
+      this.typingCharIndex = Math.min(charsToShow, entry.text.length);
+      this.drawEntries();
+    }
+
+    if (entry && this.typingCharIndex >= entry.text.length) {
+      this.typingEntryId = null;
+      this.typingCharIndex = 0;
+      this.typingTimer = 0;
+
+      if (this.typingQueue.length > 0) {
+        this.startNextTyping();
+      }
+    }
+  }
+
+  private startNextTyping(): void {
+    const nextId = this.typingQueue.shift() ?? null;
+    this.typingEntryId = nextId;
+    this.typingCharIndex = 0;
+    this.typingTimer = 0;
   }
 
   private drawEntries(): void {
@@ -34,7 +85,12 @@ export class LogPanel extends Container {
       const indentPad = " ".repeat(prefix.length);
       const availableChars = MAX_CHARS - prefix.length;
 
-      const chunks = this.wrapText(entry.text, availableChars);
+      let displayText = entry.text;
+      if (entry.id === this.typingEntryId) {
+        displayText = entry.text.substring(0, this.typingCharIndex);
+      }
+
+      const chunks = this.wrapText(displayText, availableChars);
       const lines: { text: string; indent: boolean }[] = [];
 
       for (let c = 0; c < chunks.length; c++) {

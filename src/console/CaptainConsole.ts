@@ -297,6 +297,7 @@ export class CaptainConsole extends Container implements Disposable {
     this.commandTerminal?.update(dt);
     this.exteriorView?.update(dt);
     this.alarmMatrix?.update(dt);
+    this.logPanel?.update(dt);
   }
 
   focusTerminal(): void {
