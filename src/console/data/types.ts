@@ -63,3 +63,15 @@ export interface MissionTelemetry {
   elapsed: number;
   rangeKm: number;
 }
+
+export interface AlarmEntry {
+  id: string;
+  severity: "warning" | "alarm";
+  text: string;
+}
+
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  text: string;
+}

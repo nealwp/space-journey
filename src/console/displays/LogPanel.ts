@@ -1,11 +1,6 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-
-export interface LogEntry {
-  id: string;
-  timestamp: string;
-  text: string;
-}
+import type { LogEntry } from "../data/types";
 
 const MAX_CHARS = 22;
 
@@ -32,7 +27,7 @@ export class LogPanel extends Container {
     const lineHeight = ConsoleTheme.font.labelSize + ConsoleTheme.spacing.xs;
     const maxVisible = Math.floor(this.viewHeight / lineHeight);
 
-    const lines: { text: string; indent: boolean }[] = [];
+    const entryLines: { text: string; indent: boolean }[][] = [];
 
     for (const entry of this.entries) {
       const prefix = `${entry.timestamp} `;
@@ -40,6 +35,7 @@ export class LogPanel extends Container {
       const availableChars = MAX_CHARS - prefix.length;
 
       const chunks = this.wrapText(entry.text, availableChars);
+      const lines: { text: string; indent: boolean }[] = [];
 
       for (let c = 0; c < chunks.length; c++) {
         if (c === 0) {
@@ -48,9 +44,22 @@ export class LogPanel extends Container {
           lines.push({ text: `${indentPad}${chunks[c]}`, indent: true });
         }
       }
+
+      entryLines.push(lines);
     }
 
-    const visible = lines.slice(0, maxVisible);
+    let totalLines = 0;
+    let startIndex = entryLines.length;
+    for (let i = entryLines.length - 1; i >= 0; i--) {
+      totalLines += entryLines[i].length;
+      if (totalLines > maxVisible) break;
+      startIndex = i;
+    }
+
+    const visible: { text: string; indent: boolean }[] = [];
+    for (let i = startIndex; i < entryLines.length; i++) {
+      visible.push(...entryLines[i]);
+    }
 
     for (let i = 0; i < visible.length; i++) {
       const line = visible[i];

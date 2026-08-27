@@ -1,11 +1,6 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-
-export interface AlarmEntry {
-  id: string;
-  severity: "warning" | "alarm";
-  text: string;
-}
+import type { AlarmEntry } from "../data/types";
 
 export class AlarmPanel extends Container {
   private viewWidth: number;

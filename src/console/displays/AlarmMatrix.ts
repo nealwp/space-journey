@@ -11,6 +11,8 @@ export class AlarmMatrix extends Container implements Disposable {
   private labelStyle: TextStyle;
   private rowA: StatusIndicator[] = [];
   private rowB: StatusIndicator[] = [];
+  private rowALabels: Text[] = [];
+  private rowBLabels: Text[] = [];
 
   constructor(width: number) {
     super();
@@ -26,16 +28,26 @@ export class AlarmMatrix extends Container implements Disposable {
   }
 
   setData(data: AlarmMatrixData): void {
-    this.clearRow(this.rowA);
-    this.clearRow(this.rowB);
+    this.clearRow(this.rowA, this.rowALabels);
+    this.clearRow(this.rowB, this.rowBLabels);
 
     const rowHeight = ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs + INDICATOR_SIZE + ConsoleTheme.spacing.sm;
 
-    this.rowA = this.buildRow(data.rowA, 0);
-    this.rowB = this.buildRow(data.rowB, rowHeight);
+    const { indicators: rowA, labels: rowALabels } = this.buildRow(data.rowA, 0);
+    const { indicators: rowB, labels: rowBLabels } = this.buildRow(data.rowB, rowHeight);
+
+    this.rowA = rowA;
+    this.rowALabels = rowALabels;
+    this.rowB = rowB;
+    this.rowBLabels = rowBLabels;
   }
 
-  private clearRow(indicators: StatusIndicator[]): void {
+  private clearRow(indicators: StatusIndicator[], labels: Text[]): void {
+    for (const label of labels) {
+      if (label.parent) label.parent.removeChild(label);
+      label.destroy();
+    }
+    labels.length = 0;
     for (const ind of indicators) {
       if (ind.parent) ind.parent.removeChild(ind);
       ind.destroy();
@@ -43,8 +55,9 @@ export class AlarmMatrix extends Container implements Disposable {
     indicators.length = 0;
   }
 
-  private buildRow(row: AlarmMatrixRow, yStart: number): StatusIndicator[] {
+  private buildRow(row: AlarmMatrixRow, yStart: number): { indicators: StatusIndicator[]; labels: Text[] } {
     const indicators: StatusIndicator[] = [];
+    const labels: Text[] = [];
     const colWidth = this.matrixWidth / row.labels.length;
     const indicatorY = yStart + ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs;
 
@@ -55,6 +68,7 @@ export class AlarmMatrix extends Container implements Disposable {
       label.x = x + (colWidth - label.width) / 2;
       label.y = yStart;
       this.addChild(label);
+      labels.push(label);
 
       const ind = new StatusIndicator(INDICATOR_SIZE);
       ind.x = x + (colWidth - INDICATOR_SIZE) / 2;
@@ -64,7 +78,7 @@ export class AlarmMatrix extends Container implements Disposable {
       indicators.push(ind);
     }
 
-    return indicators;
+    return { indicators, labels };
   }
 
   update(dt: number): void {

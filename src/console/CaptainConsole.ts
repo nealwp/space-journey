@@ -19,6 +19,8 @@ import { AlarmMatrix } from "./displays/AlarmMatrix";
 import { SystemSummary } from "./displays/SystemSummary";
 import type { TerminalLine } from "./terminal/TerminalBuffer";
 import type { Disposable } from "./core/ConsoleApplication";
+import type { ConsoleDataSource } from "./data/ConsoleDataSource";
+import type { ConsoleSnapshot } from "./data/ConsoleSnapshot";
 
 const panelLabels: Record<string, string> = {
   exteriorView: "EXT VIEW",
@@ -52,10 +54,13 @@ export class CaptainConsole extends Container implements Disposable {
   private inputController: TerminalInputController | null = null;
   private terminalBuffer: TerminalBuffer;
   private terminalService: MockTerminalService;
+  private dataSource: ConsoleDataSource;
+  private unsubscribe: (() => void) | null = null;
   private busy = false;
 
-  constructor() {
+  constructor(dataSource: ConsoleDataSource) {
     super();
+    this.dataSource = dataSource;
     this.terminalBuffer = new TerminalBuffer();
     this.terminalService = new MockTerminalService();
     this.drawChassis();
@@ -72,6 +77,25 @@ export class CaptainConsole extends Container implements Disposable {
     this.initGravEnvDisplay();
     this.initAlarmMatrix();
     this.initSystemSummary();
+  }
+
+  async start(): Promise<void> {
+    const snapshot = await this.dataSource.getSnapshot();
+    this.applySnapshot(snapshot);
+    this.unsubscribe = this.dataSource.subscribe((s) => this.applySnapshot(s));
+  }
+
+  private applySnapshot(snapshot: ConsoleSnapshot): void {
+    this.navigationMap?.setData(snapshot.navigation);
+    this.powerDisplay?.setData(snapshot.power);
+    this.propulsionDisplay?.setData(snapshot.propulsion);
+    this.lifeSupportDisplay?.setData(snapshot.lifeSupport);
+    this.powerDistDisplay?.setData(snapshot.powerDistribution);
+    this.gravEnvDisplay?.setData(snapshot.environment);
+    this.alarmMatrix?.setData(snapshot.alarmMatrix);
+    this.alarmPanel?.setData(snapshot.activeAlarms);
+    this.logPanel?.setData(snapshot.logs);
+    this.systemSummary?.setData(snapshot.mission);
   }
 
   private drawChassis(): void {
@@ -166,23 +190,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.navigationMap = new NavigationMap(contentWidth, contentHeight);
     navPanel.content.addChild(this.navigationMap);
-
-    this.navigationMap.setData({
-      shipX: contentWidth * 0.3,
-      shipY: contentHeight * 0.4,
-      destinationX: contentWidth * 0.75,
-      destinationY: contentHeight * 0.7,
-      rangeKm: 2_426_812,
-      etaSeconds: 3_013,
-      trajectoryPoints: [
-        { x: contentWidth * 0.3, y: contentHeight * 0.4 },
-        { x: contentWidth * 0.4, y: contentHeight * 0.25 },
-        { x: contentWidth * 0.55, y: contentHeight * 0.2 },
-        { x: contentWidth * 0.65, y: contentHeight * 0.35 },
-        { x: contentWidth * 0.7, y: contentHeight * 0.55 },
-        { x: contentWidth * 0.75, y: contentHeight * 0.7 },
-      ],
-    });
   }
 
   private initAlarmPanel(): void {
@@ -197,12 +204,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.alarmPanel = new AlarmPanel(contentWidth, contentHeight);
     alarmPanelEl.content.addChild(this.alarmPanel);
-
-    this.alarmPanel.setData([
-      { id: "a1", severity: "alarm", text: "PWR DIST B" },
-      { id: "a2", severity: "alarm", text: "COOL LOOP B TEMP" },
-      { id: "w1", severity: "warning", text: "H20 LVL LOW" },
-    ]);
   }
 
   private initLogPanel(): void {
@@ -217,14 +218,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.logPanel = new LogPanel(contentWidth, contentHeight);
     logPanelEl.content.addChild(this.logPanel);
-
-    this.logPanel.setData([
-      { id: "l1", timestamp: "10:13:02", text: "NAV SOL UPDT" },
-      { id: "l2", timestamp: "10:15:47", text: "PWR DIST B VOLT FLUC" },
-      { id: "l3", timestamp: "10:16:12", text: "COOL LOOP B TEMP HIGH" },
-      { id: "l4", timestamp: "10:18:33", text: "COMM LINK OK" },
-      { id: "l5", timestamp: "10:20:01", text: "FUEL CELLS NOMINAL" },
-    ]);
   }
 
   private initPowerDisplay(): void {
@@ -235,13 +228,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.powerDisplay = new PowerDisplay();
     panel.content.addChild(this.powerDisplay);
-
-    this.powerDisplay.setData({
-      generatorA: 98,
-      generatorB: 97,
-      reserve: 11,
-      status: "nominal",
-    });
   }
 
   private initPropulsionDisplay(): void {
@@ -252,12 +238,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.propulsionDisplay = new PropulsionDisplay();
     panel.content.addChild(this.propulsionDisplay);
-
-    this.propulsionDisplay.setData({
-      thrust: 75,
-      fuel: 62,
-      driveStatus: "nominal",
-    });
   }
 
   private initLifeSupportDisplay(): void {
@@ -268,13 +248,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.lifeSupportDisplay = new LifeSupportDisplay();
     panel.content.addChild(this.lifeSupportDisplay);
-
-    this.lifeSupportDisplay.setData({
-      o2: 21,
-      co2: 0.04,
-      temperature: 22.4,
-      humidity: 45,
-    });
   }
 
   private initPowerDistDisplay(): void {
@@ -285,10 +258,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.powerDistDisplay = new PowerDistributionDisplay();
     panel.content.addChild(this.powerDistDisplay);
-
-    this.powerDistDisplay.setData({
-      gridStatus: "nominal",
-    });
   }
 
   private initGravEnvDisplay(): void {
@@ -299,12 +268,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.gravEnvDisplay = new GravityEnvironmentDisplay();
     panel.content.addChild(this.gravEnvDisplay);
-
-    this.gravEnvDisplay.setData({
-      gForce: 1.0,
-      radiation: 0.12,
-      temperature: 21.8,
-    });
   }
 
   private initAlarmMatrix(): void {
@@ -318,17 +281,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.alarmMatrix = new AlarmMatrix(contentWidth);
     panel.content.addChild(this.alarmMatrix);
-
-    this.alarmMatrix.setData({
-      rowA: {
-        labels: ["PWR", "PROP", "LIFE", "NAV", "COMM"],
-        states: ["nominal", "nominal", "warning", "nominal", "alarm"],
-      },
-      rowB: {
-        labels: ["COOL", "FUEL", "O2", "DCLK", "AUX"],
-        states: ["nominal", "alarm", "nominal", "warning", "nominal"],
-      },
-    });
   }
 
   private initSystemSummary(): void {
@@ -339,13 +291,6 @@ export class CaptainConsole extends Container implements Disposable {
 
     this.systemSummary = new SystemSummary();
     panel.content.addChild(this.systemSummary);
-
-    this.systemSummary.setData({
-      missionId: "VOY-2847",
-      destination: "STATION EREBUS",
-      elapsed: 2533,
-      rangeKm: 2_426_812,
-    });
   }
 
   update(dt: number): void {
@@ -396,6 +341,8 @@ export class CaptainConsole extends Container implements Disposable {
   };
 
   destroy(): void {
+    this.unsubscribe?.();
+    this.unsubscribe = null;
     this.inputController?.destroy();
     for (const panel of this.panels) {
       panel.destroy({ children: true });
