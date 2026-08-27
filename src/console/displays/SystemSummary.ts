@@ -18,6 +18,7 @@ export class SystemSummary extends Container implements Disposable {
     });
 
     this.text = new Text({ text: "", style });
+    this.text.x = ConsoleTheme.spacing.sm;
     this.text.y = 0;
     this.addChild(this.text);
   }

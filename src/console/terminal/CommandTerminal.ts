@@ -25,9 +25,11 @@ export class CommandTerminal extends Container {
     this.lineHeight = ConsoleTheme.font.terminalSize + ConsoleTheme.spacing.xs;
 
     this.linesContainer = new Container();
+    this.linesContainer.x = ConsoleTheme.spacing.sm;
     this.addChild(this.linesContainer);
 
     const inputRow = new Container();
+    inputRow.x = ConsoleTheme.spacing.sm;
     this.addChild(inputRow);
 
     const prefixStyle = new TextStyle({

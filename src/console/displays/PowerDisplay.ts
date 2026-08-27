@@ -18,6 +18,8 @@ export class PowerDisplay extends Container {
   constructor() {
     super();
 
+    this.x = ConsoleTheme.spacing.sm;
+
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
     this.genA = new TelemetryText({ label: "GEN A", labelWidth: maxLabelWidth });

@@ -17,6 +17,8 @@ export class LifeSupportDisplay extends Container {
   constructor() {
     super();
 
+    this.x = ConsoleTheme.spacing.sm;
+
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
     this.o2 = new TelemetryText({ label: "O2", labelWidth: maxLabelWidth });

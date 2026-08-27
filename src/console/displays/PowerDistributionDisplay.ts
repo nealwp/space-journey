@@ -1,4 +1,5 @@
 import { Container } from "pixi.js";
+import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
 import type { PowerDistributionTelemetry } from "../data/types";
 import { formatStatus, statusColor } from "../utils/status";
@@ -8,6 +9,8 @@ export class PowerDistributionDisplay extends Container {
 
   constructor() {
     super();
+
+    this.x = ConsoleTheme.spacing.sm;
 
     this.grid = new TelemetryText({ label: "GRID" });
     this.grid.y = 0;

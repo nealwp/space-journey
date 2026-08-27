@@ -16,6 +16,8 @@ export class GravityEnvironmentDisplay extends Container {
   constructor() {
     super();
 
+    this.x = ConsoleTheme.spacing.sm;
+
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
     this.gForce = new TelemetryText({ label: "G-FORCE", labelWidth: maxLabelWidth });

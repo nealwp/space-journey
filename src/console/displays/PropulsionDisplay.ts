@@ -17,6 +17,8 @@ export class PropulsionDisplay extends Container {
   constructor() {
     super();
 
+    this.x = ConsoleTheme.spacing.sm;
+
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
     this.thrust = new TelemetryText({ label: "THRUST", labelWidth: maxLabelWidth });
