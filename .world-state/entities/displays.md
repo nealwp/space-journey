@@ -2,7 +2,7 @@
 id: displays
 type: entity
 status: current
-updated: 2026-08-26
+updated: 2026-08-27
 owner_paths:
   - src/console/displays/ExteriorView.ts
   - src/console/displays/NavigationMap.ts
@@ -19,6 +19,7 @@ links:
   - core
   - components
   - console
+  - data
 ---
 Specific instrument displays — visual panels that render ship data.
 
@@ -40,24 +41,27 @@ The displays subsystem contains specific instrument displays that compose compon
 
 ## Current state
 
-Step 8 complete. All panels implemented:
-- PowerDisplay: GEN A 98%, GEN B 97%, RESRV 11%, STAT NOM
-- PropulsionDisplay: THRUST 75%, FUEL 62%, DRIVE NOM
-- LifeSupportDisplay: O2 21%, CO2 0.04%, TEMP 22.4C, HUMID 45%
-- PowerDistributionDisplay: GRID NOM
-- GravityEnvironmentDisplay: G-FORCE 1.00, RAD 0.12 mSv, TEMP 21.8C
-- AlarmMatrix: Row A — PWR NOM, PROP NOM, LIFE WARN, NAV NOM, COMM ALRM; Row B — COOL NOM, FUEL ALRM, O2 NOM, DCLK WARN, AUX NOM (blinking)
-- SystemSummary: VOY-2847 | STATION EREBUS | 00:42:13 | 2.43M KM
-- All panels use TelemetryText components with mock data via setData()
+Step 9 complete. All panels implemented:
+- All displays receive data via `setData()` from `CaptainConsole.applySnapshot()`, not hardcoded values
+- AlarmPanel and LogPanel now import AlarmEntry/LogEntry types from `../data/types` (centralized)
+- PowerDisplay: GEN A/B %, RESRV %, STAT status
+- PropulsionDisplay: THRUST %, FUEL %, DRIVE status
+- LifeSupportDisplay: O2 %, CO2 %, TEMP C, HUMID %
+- PowerDistributionDisplay: GRID status
+- GravityEnvironmentDisplay: G-FORCE, RAD mSv, TEMP C
+- AlarmMatrix: 2×5 grid of blinking status indicators
+- SystemSummary: mission ID, destination, elapsed time, range
+- All panels use TelemetryText components with data-driven values via setData()
 - TelemetryText renders label and value horizontally (same line)
 - Each display computes maxLabelWidth and passes it to TelemetryText for aligned value columns
-- Formatting utilities extracted to `src/console/utils/formatting.ts`
+- Formatting utilities shared from `src/console/utils/formatting.ts`
 
 ## Gotchas / non-obvious constraints
 
 - ExteriorView.update(dt) must be called each frame for star animation — wired via CaptainConsole.update()
-- NavigationMap.setData() is called every 10 seconds for plot refresh — wired via CaptainConsole with setInterval
+- NavigationMap.setData() receives full NavigationDisplayData including trajectory points — nav panel dimensions affect pixel coordinates
 - NavigationDisplayData interface defined in `src/console/data/types.ts` — shared across displays
+- AlarmEntry and LogEntry types now centralized in `src/console/data/types.ts` — AlarmPanel and LogPanel import from there
 - PixiJS v8 does not support dashed lines natively — NavigationMap uses a manual drawDashedLine helper with moveTo/lineTo segments
 - Range/ETA labels have a solid background rect to avoid overlaying the dashed grid
 - AlarmPanel and LogPanel clear and redraw children on each setData() call

@@ -1,11 +1,6 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-
-export interface LogEntry {
-  id: string;
-  timestamp: string;
-  text: string;
-}
+import type { LogEntry } from "../data/types";
 
 const MAX_CHARS = 22;
 
