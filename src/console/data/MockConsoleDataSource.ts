@@ -54,11 +54,12 @@ const LOG_POOL: { text: string; severity: "info" | "warning" }[] = [
   { text: "PWR GRID REBAL", severity: "info" },
 ];
 
+const TITLE_OFFSET = ConsoleTheme.spacing.xs + ConsoleTheme.font.titleSize + ConsoleTheme.spacing.xs;
+
 function getNavContentDimensions(): { w: number; h: number } {
-  const innerPad = ConsoleTheme.contentPad;
   return {
-    w: Layout.navMap.width - innerPad * 2,
-    h: Layout.navMap.height - innerPad * 2,
+    w: Layout.navMap.width - ConsoleTheme.contentPad * 2,
+    h: Layout.navMap.height - ConsoleTheme.contentPad - TITLE_OFFSET,
   };
 }
 
