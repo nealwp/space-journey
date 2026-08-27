@@ -38,7 +38,7 @@ const panelLabels: Record<string, string> = {
   mainTerminal: "MAIN TERM",
   alarm: "ALRM",
   log: "LOG",
-  alarmMatrix: "ALRM MATRIX",
+  alarmMatrix: "ALRM MTX",
   powerSys: "PWR SYS",
   propulsionSys: "PROP SYS",
   lifeSupport: "LIFE SUPP",
