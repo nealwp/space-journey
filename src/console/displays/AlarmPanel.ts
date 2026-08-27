@@ -8,9 +8,9 @@ export class AlarmPanel extends Container {
   private viewWidth: number;
   private viewHeight: number;
   private entries: AlarmEntry[] = [];
-  private knownIds = new Set<string>();
+  private typedTexts = new Set<string>();
 
-  private typingEntryId: string | null = null;
+  private typingEntryKey: string | null = null;
   private typingCharIndex = 0;
   private typingTimer = 0;
   private typingQueue: string[] = [];
@@ -23,18 +23,16 @@ export class AlarmPanel extends Container {
   }
 
   setData(alarms: AlarmEntry[]): void {
-    const prevIds = this.knownIds;
-
     for (const entry of alarms) {
-      if (!prevIds.has(entry.id)) {
-        this.knownIds.add(entry.id);
-        this.typingQueue.push(entry.id);
+      const key = `${entry.severity}:${entry.text}`;
+      if (!this.typedTexts.has(key)) {
+        this.typingQueue.push(key);
       }
     }
 
     this.entries = alarms;
 
-    if (this.typingEntryId === null && this.typingQueue.length > 0) {
+    if (this.typingEntryKey === null && this.typingQueue.length > 0) {
       this.startNextTyping();
     }
 
@@ -42,12 +40,16 @@ export class AlarmPanel extends Container {
   }
 
   update(dt: number): void {
-    if (this.typingEntryId === null) return;
+    if (this.typingEntryKey === null) return;
 
     this.typingTimer += dt;
-    const entry = this.entries.find((e) => e.id === this.typingEntryId);
+    const [severity, ...textParts] = this.typingEntryKey.split(":");
+    const text = textParts.join(":");
+    const entry = this.entries.find(
+      (e) => e.severity === severity && e.text === text,
+    );
     if (!entry) {
-      this.typingEntryId = null;
+      this.typingEntryKey = null;
       return;
     }
 
@@ -61,7 +63,8 @@ export class AlarmPanel extends Container {
     }
 
     if (this.typingCharIndex >= fullText.length) {
-      this.typingEntryId = null;
+      this.typedTexts.add(this.typingEntryKey);
+      this.typingEntryKey = null;
       this.typingCharIndex = 0;
       this.typingTimer = 0;
 
@@ -72,8 +75,8 @@ export class AlarmPanel extends Container {
   }
 
   private startNextTyping(): void {
-    const nextId = this.typingQueue.shift() ?? null;
-    this.typingEntryId = nextId;
+    const nextKey = this.typingQueue.shift() ?? null;
+    this.typingEntryKey = nextKey;
     this.typingCharIndex = 0;
     this.typingTimer = 0;
   }
@@ -94,7 +97,8 @@ export class AlarmPanel extends Container {
         : ConsoleTheme.colors.yellow;
 
       let displayText = `${prefix}${entry.text}`;
-      if (entry.id === this.typingEntryId) {
+      const entryKey = `${entry.severity}:${entry.text}`;
+      if (entryKey === this.typingEntryKey) {
         displayText = displayText.substring(0, this.typingCharIndex);
       }
 
