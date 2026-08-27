@@ -39,8 +39,10 @@ export class NavigationMap extends Container {
     this.markersGraphics = new Graphics();
     this.addChild(this.markersGraphics);
 
+    const lineH = ConsoleTheme.font.labelSize + ConsoleTheme.spacing.xs;
+
     const labelBg = new Graphics();
-    const labelY = height - ConsoleTheme.spacing.lg - ConsoleTheme.font.valueSize - ConsoleTheme.spacing.xs;
+    const labelY = height - lineH * 2 - ConsoleTheme.spacing.xs;
     labelBg
       .rect(0, labelY, width, height - labelY)
       .fill(ConsoleTheme.colors.screen);
@@ -48,20 +50,19 @@ export class NavigationMap extends Container {
 
     const labelStyle = new TextStyle({
       fontFamily: ConsoleTheme.font.family,
-      fontSize: ConsoleTheme.font.valueSize,
+      fontSize: ConsoleTheme.font.labelSize,
       fill: ConsoleTheme.colors.textDim,
       letterSpacing: ConsoleTheme.font.letterSpacing,
     });
 
     this.rangeLabel = new Text({ text: "RNG ---", style: labelStyle });
     this.rangeLabel.x = ConsoleTheme.spacing.sm;
-    this.rangeLabel.y = height - ConsoleTheme.spacing.lg - ConsoleTheme.font.valueSize;
+    this.rangeLabel.y = labelY;
     this.addChild(this.rangeLabel);
 
     this.etaLabel = new Text({ text: "ETA --:--:--", style: labelStyle });
-    this.etaLabel.anchor.set(1, 0);
-    this.etaLabel.x = width - ConsoleTheme.spacing.sm;
-    this.etaLabel.y = height - ConsoleTheme.spacing.lg - ConsoleTheme.font.valueSize;
+    this.etaLabel.x = ConsoleTheme.spacing.sm;
+    this.etaLabel.y = labelY + lineH;
     this.addChild(this.etaLabel);
 
     this.drawBackground();
