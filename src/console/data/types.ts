@@ -44,3 +44,22 @@ export interface EnvironmentTelemetry {
   radiation: number;
   temperature: number;
 }
+
+export type IndicatorState = "off" | "nominal" | "warning" | "alarm";
+
+export interface AlarmMatrixRow {
+  labels: string[];
+  states: IndicatorState[];
+}
+
+export interface AlarmMatrixData {
+  rowA: AlarmMatrixRow;
+  rowB: AlarmMatrixRow;
+}
+
+export interface MissionTelemetry {
+  missionId: string;
+  destination: string;
+  elapsed: number;
+  rangeKm: number;
+}

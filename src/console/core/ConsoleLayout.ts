@@ -142,7 +142,7 @@ export const Layout: LayoutRegions = {
   systemSummary: {
     x: leftX,
     y: botY,
-    width: contentW,
+    width: rightX - PANEL_GAP - leftX,
     height: BOTTOM_ROW_H,
   },
 };

@@ -24,7 +24,7 @@ The console subsystem contains:
 
 ## Current state
 
-Step 7 complete. CaptainConsole renders:
+Step 8 complete. CaptainConsole renders:
 - Gray chassis with inner dark border
 - 12 labeled panel placeholders using `Panel` component
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
@@ -37,6 +37,8 @@ Step 7 complete. CaptainConsole renders:
 - Life support panel — O2, CO2, TEMP, HUMID
 - Power dist panel — GRID status
 - Grav/env panel — G-FORCE, RAD, TEMP
+- Alarm matrix — 2×5 grid of status lights (Row A: PWR, PROP, LIFE, NAV, COMM; Row B: COOL, FUEL, O2, DCLK, AUX)
+- System summary — mission ID, destination, elapsed time, range
 - All panels positioned by ConsoleLayout
 - Proper cleanup via `destroy()` method
 
@@ -44,8 +46,9 @@ Step 7 complete. CaptainConsole renders:
 
 - CaptainConsole uses a `panelLabels` map to convert layout keys to abbreviated display labels — add new panels here
 - CaptainConsole owns the terminal submission flow — coordinates TerminalBuffer, TerminalInputController, MockTerminalService
-- CaptainConsole.update(dt) must be called each frame for cursor blinking and star animation — wired via ticker in main.ts
+- CaptainConsole.update(dt) must be called each frame for cursor blinking, star animation, and alarm blink — wired via ticker in main.ts
 - NavigationMap.setData() called every 10 seconds via setInterval in CaptainConsole — interval must be cleared in destroy()
-- All 5 lower telemetry displays receive mock data via setData() on init
+- All displays receive mock data via setData() on init
+- AlarmMatrix.update(dt) must be called each frame for status indicator blinking
 - The `destroy()` method cleans up TerminalInputController, intervals, and all Panel instances
 - main.ts registers `beforeunload` handler — any new resources must also be cleaned up there
