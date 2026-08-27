@@ -59,7 +59,8 @@ export class NavigationMap extends Container {
     this.addChild(this.rangeLabel);
 
     this.etaLabel = new Text({ text: "ETA --:--:--", style: labelStyle });
-    this.etaLabel.x = width - ConsoleTheme.spacing.sm - 90;
+    this.etaLabel.anchor.set(1, 0);
+    this.etaLabel.x = width - ConsoleTheme.spacing.sm;
     this.etaLabel.y = height - ConsoleTheme.spacing.lg - ConsoleTheme.font.valueSize;
     this.addChild(this.etaLabel);
 
