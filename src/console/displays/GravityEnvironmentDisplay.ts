@@ -1,20 +1,11 @@
-import { Container, Text, TextStyle } from "pixi.js";
+import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
 import type { EnvironmentTelemetry } from "../data/types";
+import { formatTemperature } from "../utils/formatting";
+import { measureLabelWidth } from "../utils/measureLabelWidth";
 
 const LABELS = ["G-FORCE", "RAD", "TEMP"];
-
-function measureLabelWidth(label: string): number {
-  const style = new TextStyle({
-    fontFamily: ConsoleTheme.font.family,
-    fontSize: ConsoleTheme.font.valueSize,
-    letterSpacing: 1,
-  });
-  const t = new Text({ text: label, style });
-  return t.width;
-}
-
 const maxLabelWidth = Math.max(...LABELS.map(measureLabelWidth));
 
 export class GravityEnvironmentDisplay extends Container {
@@ -24,6 +15,8 @@ export class GravityEnvironmentDisplay extends Container {
 
   constructor() {
     super();
+
+    this.x = ConsoleTheme.spacing.sm;
 
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
@@ -43,6 +36,6 @@ export class GravityEnvironmentDisplay extends Container {
   setData(data: EnvironmentTelemetry): void {
     this.gForce.setValue(data.gForce.toFixed(2));
     this.radiation.setValue(`${data.radiation.toFixed(2)} mSv`);
-    this.temp.setValue(`${data.temperature.toFixed(1)}C`);
+    this.temp.setValue(formatTemperature(data.temperature));
   }
 }

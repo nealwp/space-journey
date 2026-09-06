@@ -80,7 +80,7 @@ export const Layout: LayoutRegions = {
     x: centerX,
     y: topY,
     width: centerColW,
-    height: topRowH + PANEL_GAP + MIDDLE_ROW_H,
+    height: topRowH,
   },
 
   alarm: {

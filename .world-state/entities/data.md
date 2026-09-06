@@ -26,7 +26,7 @@ The data subsystem defines the boundary between data sources and the UI:
 
 ## Current state
 
-Step 9 complete. The data layer is fully wired:
+Step 11 complete. The data layer is fully wired:
 
 - `ConsoleSnapshot` aggregates all telemetry into a single snapshot
 - `ConsoleDataSource` interface provides `getSnapshot()` + `subscribe()` + optional `destroy()`
@@ -36,6 +36,7 @@ Step 9 complete. The data layer is fully wired:
 - `AlarmEntry` and `LogEntry` types moved from display files to `types.ts` for centralization
 - No display directly owns authoritative game-state values
 - `main.ts` creates `MockConsoleDataSource`, passes it to `CaptainConsole`, cleans up on `beforeunload`
+- MockConsoleDataSource uses `ConsoleTheme.contentPad` for nav content dimensions
 
 ## Gotchas / non-obvious constraints
 

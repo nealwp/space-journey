@@ -2,7 +2,7 @@
 id: core
 type: entity
 status: current
-updated: 2026-08-26
+updated: 2026-08-27
 owner_paths:
   - src/console/core/ConsoleApplication.ts
   - src/console/core/ConsoleLayout.ts
@@ -23,11 +23,12 @@ The core subsystem provides the three foundational modules that all other consol
 
 ## Current state
 
-Step 6 complete. All three modules are implemented and working:
+Step 11 complete. All three modules are implemented and working:
 - PixiJS v8 async `Application.init()` with `resizeTo: window`
 - Viewport scaling with `Math.min(vw/1280, vh/720)` and pixel-snap centering
 - 12 panel regions positioned in a three-column grid (alarmLog split into alarm + log)
 - Theme colors matching PLAN.md specification
+- ConsoleTheme now includes `font.letterSpacing`, `contentPad`, `blinkIntervalMs`, `indicatorSize`
 
 ## Gotchas / non-obvious constraints
 
@@ -35,3 +36,4 @@ Step 6 complete. All three modules are implemented and working:
 - ConsoleLayout computes positions from constants (CHASSIS_PAD=14, PANEL_GAP=6) — changing these affects all panel positions
 - ConsoleApplication uses `Math.round()` for pixel-snap centering — don't remove this or text will blur
 - The `Disposable` interface in ConsoleApplication.ts must be implemented by any component that owns listeners or timers
+- `contentPad` (4px) is the standard inner padding for panel content areas — replaces scattered `border.inner + 2` patterns

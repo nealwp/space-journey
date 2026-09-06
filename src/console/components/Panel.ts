@@ -42,7 +42,7 @@ export class Panel extends Container {
         fontFamily: ConsoleTheme.font.family,
         fontSize: ConsoleTheme.font.titleSize,
         fill: ConsoleTheme.colors.textDim,
-        letterSpacing: 1,
+        letterSpacing: ConsoleTheme.font.letterSpacing,
       });
 
       this.titleText = new Text({ text: options.title, style });
@@ -61,7 +61,7 @@ export class Panel extends Container {
       .rect(0, 0, this.panelWidth, this.panelHeight)
       .fill(ConsoleTheme.colors.bezel);
 
-    const innerPad = ConsoleTheme.border.inner + 2;
+    const innerPad = ConsoleTheme.contentPad;
 
     this.screen
       .rect(innerPad, innerPad, this.panelWidth - innerPad * 2, this.panelHeight - innerPad * 2)

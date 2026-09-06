@@ -25,7 +25,7 @@ The console subsystem contains:
 
 ## Current state
 
-Step 9 complete. CaptainConsole renders:
+Step 11 complete. CaptainConsole renders:
 - Gray chassis with inner dark border
 - 12 labeled panel placeholders using `Panel` component
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
@@ -35,6 +35,7 @@ Step 9 complete. CaptainConsole renders:
 - `applySnapshot()` fans ConsoleSnapshot data to all displays via their `setData()` methods
 - No hardcoded initial data in init methods — components are created but data comes from the data source
 - Proper cleanup via `destroy()` method — unsubscribes from data source, destroys panels, cleans up input controller
+- Uses `ConsoleTheme.contentPad` instead of hardcoded `border.inner + 2`
 
 ## Gotchas / non-obvious constraints
 

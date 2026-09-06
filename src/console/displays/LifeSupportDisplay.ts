@@ -1,20 +1,11 @@
-import { Container, Text, TextStyle } from "pixi.js";
+import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
 import type { LifeSupportTelemetry } from "../data/types";
+import { formatPercent, formatTemperature } from "../utils/formatting";
+import { measureLabelWidth } from "../utils/measureLabelWidth";
 
 const LABELS = ["O2", "CO2", "TEMP", "HUMID"];
-
-function measureLabelWidth(label: string): number {
-  const style = new TextStyle({
-    fontFamily: ConsoleTheme.font.family,
-    fontSize: ConsoleTheme.font.valueSize,
-    letterSpacing: 1,
-  });
-  const t = new Text({ text: label, style });
-  return t.width;
-}
-
 const maxLabelWidth = Math.max(...LABELS.map(measureLabelWidth));
 
 export class LifeSupportDisplay extends Container {
@@ -25,6 +16,8 @@ export class LifeSupportDisplay extends Container {
 
   constructor() {
     super();
+
+    this.x = ConsoleTheme.spacing.sm;
 
     const lineHeight = ConsoleTheme.font.valueSize + ConsoleTheme.spacing.xs;
 
@@ -46,9 +39,9 @@ export class LifeSupportDisplay extends Container {
   }
 
   setData(data: LifeSupportTelemetry): void {
-    this.o2.setValue(`${data.o2}%`);
-    this.co2.setValue(`${data.co2}%`);
-    this.temp.setValue(`${data.temperature.toFixed(1)}C`);
-    this.humid.setValue(`${data.humidity}%`);
+    this.o2.setValue(formatPercent(data.o2));
+    this.co2.setValue(formatPercent(data.co2));
+    this.temp.setValue(formatTemperature(data.temperature));
+    this.humid.setValue(formatPercent(data.humidity));
   }
 }

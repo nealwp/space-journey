@@ -41,35 +41,35 @@ The displays subsystem contains specific instrument displays that compose compon
 
 ## Current state
 
-Step 9 complete. All panels implemented:
+Step 11 complete. All panels implemented:
 - All displays receive data via `setData()` from `CaptainConsole.applySnapshot()`, not hardcoded values
 - AlarmPanel and LogPanel now import AlarmEntry/LogEntry types from `../data/types` (centralized)
-- PowerDisplay: GEN A/B %, RESRV %, STAT status
-- PropulsionDisplay: THRUST %, FUEL %, DRIVE status
-- LifeSupportDisplay: O2 %, CO2 %, TEMP C, HUMID %
-- PowerDistributionDisplay: GRID status
-- GravityEnvironmentDisplay: G-FORCE, RAD mSv, TEMP C
-- AlarmMatrix: 2×5 grid of blinking status indicators
+- PowerDisplay: GEN A/B %, RESRV %, STAT status — uses `formatPercent()`, `formatStatus()`, `statusColor()`
+- PropulsionDisplay: THRUST %, FUEL %, DRIVE status — uses `formatPercent()`, `formatStatus()`, `statusColor()`
+- LifeSupportDisplay: O2 %, CO2 %, TEMP C, HUMID % — uses `formatPercent()`, `formatTemperature()`
+- PowerDistributionDisplay: GRID status — uses `formatStatus()`, `statusColor()`
+- GravityEnvironmentDisplay: G-FORCE, RAD mSv, TEMP C — uses `formatTemperature()`
+- AlarmMatrix: 2×5 grid of blinking status indicators — uses `ConsoleTheme.indicatorSize`
 - SystemSummary: mission ID, destination, elapsed time, range
+- NavigationMap: plot refreshes every 10 seconds, labels update every tick — uses shared `drawDashedLine` from `rendering/primitives.ts`
 - All panels use TelemetryText components with data-driven values via setData()
-- TelemetryText renders label and value horizontally (same line)
-- Each display computes maxLabelWidth and passes it to TelemetryText for aligned value columns
-- Formatting utilities shared from `src/console/utils/formatting.ts`
+- Each display imports `measureLabelWidth` from `utils/measureLabelWidth.ts` for aligned value columns
+- All `letterSpacing` references use `ConsoleTheme.font.letterSpacing`
 
 ## Gotchas / non-obvious constraints
 
 - ExteriorView.update(dt) must be called each frame for star animation — wired via CaptainConsole.update()
-- NavigationMap.setData() receives full NavigationDisplayData including trajectory points — nav panel dimensions affect pixel coordinates
+- NavigationMap.setData() stores pending data and redraws plot every 10 seconds — labels update immediately
 - NavigationDisplayData interface defined in `src/console/data/types.ts` — shared across displays
-- AlarmEntry and LogEntry types now centralized in `src/console/data/types.ts` — AlarmPanel and LogPanel import from there
-- PixiJS v8 does not support dashed lines natively — NavigationMap uses a manual drawDashedLine helper with moveTo/lineTo segments
+- AlarmEntry and LogEntry types centralized in `src/console/data/types.ts`
+- `drawDashedLine` extracted to `src/console/rendering/primitives.ts` — shared by NavigationMap
 - Range/ETA labels have a solid background rect to avoid overlaying the dashed grid
 - AlarmPanel and LogPanel clear and redraw children on each setData() call
 - LogPanel uses MAX_CHARS=22 for word-wrapping — continuation lines indent to align with message text, no timestamp repeat
 - LogPanel uses `labelSize` (11px) instead of `valueSize` (12px) to fit more entries
 - All 5 lower telemetry displays use TelemetryText for label/value pairs
-- Status colors (green/yellow/red) mapped from SystemStatus via TelemetryColor type
-- TelemetryText accepts optional `labelWidth` to align values across instances — each display measures longest label
+- Status colors (green/yellow/red) mapped from SystemStatus via shared `utils/status.ts`
+- `measureLabelWidth` shared from `utils/measureLabelWidth.ts` — creates temporary Text to measure label width
 - AlarmMatrix uses StatusIndicator component — update(dt) must be called each frame for blink
 - AlarmMatrix accepts AlarmMatrixData with rowA/rowB, each containing labels[] and states[]
 - AlarmMatrix rebuilds rows on setData() — clears and recreates all children (labels + indicators)

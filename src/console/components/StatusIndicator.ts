@@ -17,7 +17,7 @@ export class StatusIndicator extends Container {
   private blinkTimer = 0;
   private blinkVisible = true;
 
-  constructor(size = 6) {
+  constructor(size = ConsoleTheme.indicatorSize) {
     super();
 
     this.indicatorSize = size;
@@ -41,8 +41,8 @@ export class StatusIndicator extends Container {
     if (this.currentState !== "alarm") return;
 
     this.blinkTimer += dt;
-    if (this.blinkTimer >= 500) {
-      this.blinkTimer -= 500;
+    if (this.blinkTimer >= ConsoleTheme.blinkIntervalMs) {
+      this.blinkTimer -= ConsoleTheme.blinkIntervalMs;
       this.blinkVisible = !this.blinkVisible;
       this.light.visible = this.blinkVisible;
     }

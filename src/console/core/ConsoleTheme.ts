@@ -36,7 +36,12 @@ export const ConsoleTheme = {
     valueSize: 12,
     terminalSize: 13,
     titleSize: 10,
+    letterSpacing: 1,
   },
+
+  contentPad: 4,
+  blinkIntervalMs: 500,
+  indicatorSize: 6,
 } as const;
 
 export type TelemetryColor =
