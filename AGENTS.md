@@ -2,18 +2,23 @@
 
 ## Project Overview
 
-Space Journey is a PixiJS v8 captain's console frontend for a spacecraft game. The entire interface renders as a single PixiJS application — a late-1980s industrial spacecraft terminal with low-resolution / pixel-art presentation, gray utilitarian hardware framing, dark CRT-style displays, and sparse green/yellow/red status colors.
+Space Journey is a spacecraft game split across two concerns in a single monorepo:
 
-The only user interaction mechanism is the command terminal. All other panels are read-only instruments. The initial implementation is Phase 1 of a larger game — this phase establishes a clean, functional frontend foundation with mock data, ready to have a real spacecraft simulation plugged in later.
+- **@space-journey/console** — a PixiJS v8 captain's console frontend. The entire interface renders as a single PixiJS application — a late-1980s industrial spacecraft terminal with low-resolution / pixel-art presentation, gray utilitarian hardware framing, dark CRT-style displays, and sparse green/yellow/red status colors.
+- **@space-journey/server + @space-journey/systems/\*** — the ship's internal simulated systems, all running on a single server for as long as possible. Each system is a separate workspace package so one can later be promoted to its own process without touching the others.
+
+The only user interaction mechanism is the command terminal. All other panels are read-only instruments. The frontend is served separately from the systems server; it connects to the server over WebSocket for live telemetry.
 
 Reference: `PLAN.md` contains the full design specification.
 
 ## Commands
 
 ```bash
-npm run dev          # Start Vite dev server on port 3000
-npm run build        # Production build via Vite
-npm run typecheck    # TypeScript type checking (tsc --noEmit)
+npm run dev          # Boot the systems server (ws://localhost:8080) AND the Vite console (port 3000) via concurrently
+npm run dev -w @space-journey/console   # Vite console only
+npm run dev -w @space-journey/server    # Systems server only
+npm run build        # Production build of the console via Vite
+npm run typecheck    # TypeScript type checking across all workspaces (tsc --noEmit)
 ```
 
 **Always run `npm run typecheck` before committing.** There is no test suite.
@@ -44,64 +49,50 @@ from the code and from chat memory. Rules:
 
 - **PixiJS v8.20.1** — rendering engine (WebGL, async `Application.init()`)
 - **TypeScript** — strict mode, ES2020 target, ESNext modules
-- **Vite** — dev server and bundler, ESM (`"type": "module"`)
+- **Vite** — console dev server and bundler, ESM (`"type": "module"`)
+- **Node.js + `ws`** — ship systems server; systems emit snapshot slices over WebSocket
+- **`tsx`** — runs the server's TypeScript directly (`npm run dev -w @space-journey/server`)
+- **`concurrently`** — one root `npm run dev` boots server + console
+- **npm workspaces** — one package per concern; `@space-journey/contracts` is the shared, dependency-free type/transport boundary
 - **No external assets** — all visuals are procedural rectangles, lines, text, and circles
 - **No frameworks** — no React, no DOM UI (except a hidden textarea for terminal input)
 
 ## Project Structure
 
 ```
-src/
-  main.ts                             Entry point — bootstraps ConsoleApplication + CaptainConsole
+packages/
+  contracts/                        Shared, dependency-free types + transport protocol
+    src/
+      index.ts                      Barrel re-exports
+      status.ts                     SystemStatus, IndicatorState
+      snapshot.ts                   Telemetry slice types (PowerTelemetry, etc.) + SystemSnapshot
+      system.ts                     ShipSystem interface
+      messages.ts                   WebSocket message envelope (SUBSCRIBE / SYSTEM_UPDATE)
 
-  console/
-    CaptainConsole.ts                 Top-level orchestrator — owns root container, draws chassis + panels
+  systems/
+    power/                          Ship power system (first system; others added one at a time)
+      src/index.ts                  PowerSystem implements ShipSystem
 
-    core/
-      ConsoleApplication.ts           PixiJS Application wrapper — init, viewport scaling, resize handling
-      ConsoleLayout.ts                Fixed 1280×720 layout — defines PanelRect positions for all regions
-      ConsoleTheme.ts                 Single source of truth — colors, spacing, borders, font sizes
+  server/                           The single ship-systems server
+    src/
+      index.ts                      Boots host, registers systems, installs shutdown hooks
+      registry.ts                   Registers/start/stops systems, fans updates to listeners
+      transport.ts                  WebSocketServer, subscription handling, broadcast
 
-    components/                       Reusable visual primitives (Phase 1 Step 2+)
-      Panel.ts                        Generic panel frame (chassis → bezel → screen → title)
-      PanelHeader.ts                  Panel title text
-      TelemetryText.ts               Label + value text, supports setValue() / setColor()
-      StatusIndicator.ts             Tiny square light — off / nominal / warning / alarm
-      BarMeter.ts                    Coarse block-based fill meter
-
-    displays/                         Specific instrument displays (Phase 1 Steps 4–8+)
-      ExteriorView.ts                Slow-moving starfield camera feed
-      NavigationMap.ts               Orbital/trajectory plot with ship/destination markers
-      AlarmLog.ts                    Severity-colored event log
-      PowerDisplay.ts                Generator A/B, reserve, status
-      PropulsionDisplay.ts           Thrust, fuel, drive status
-      LifeSupportDisplay.ts          O2, CO2, temp, humidity
-      PowerDistributionDisplay.ts    Power grid status
-      GravityEnvironmentDisplay.ts   G-force, radiation, temp
-      AlarmMatrix.ts                 Industrial annunciator panel (tiny square lights)
-      SystemSummary.ts               Compact bottom status strip
-
-    terminal/                         Command terminal — the primary interaction
-      CommandTerminal.ts             Rendering only — displays lines and cursor
-      TerminalBuffer.ts              Bounded history, auto-scroll, truncation
-      TerminalInputController.ts     Hidden DOM textarea captures keyboard input
-      TerminalService.ts             Interface: send(message) → Promise<string>
-      MockTerminalService.ts         Returns fixed response for all commands
-
-    data/                             Data contracts and state management
-      ConsoleState.ts                Runtime state container
-      ConsoleDataSource.ts           Interface: getSnapshot(), subscribe()
-      MockConsoleDataSource.ts       Deterministic mock telemetry data
-      types.ts                       All shared types and interfaces
-
-    rendering/                        PixiJS drawing helpers
-      PixelText.ts                   Text rendering helper
-      crt.ts                         Scanline / CRT effects
-      primitives.ts                  Reusable drawing primitives
-
-    utils/                            Pure functions
-      formatting.ts                  formatRangeKm, formatPercent, formatTemperature, etc.
-      math.ts                        Math helpers
+  console/                          PixiJS captain's console (Vite app)
+    index.html
+    vite.config.ts
+    src/
+      main.ts                       Entry point — bootstraps ConsoleApplication + CaptainConsole
+      console/
+        CaptainConsole.ts           Top-level orchestrator — owns root container, draws chassis + panels
+        core/                       ConsoleApplication, ConsoleLayout, ConsoleTheme
+        components/                 Panel, TelemetryText, StatusIndicator, BarMeter
+        displays/                   ExteriorView, NavigationMap, PowerDisplay, etc.
+        terminal/                   CommandTerminal, TerminalBuffer, TerminalInputController, TerminalService
+        data/                       ConsoleDataSource interface, snapshot assembly
+        rendering/                  PixiJS drawing helpers
+        utils/                      Formatting and status utilities
 ```
 
 ## Architecture Rules
@@ -109,11 +100,12 @@ src/
 ### Data flow is strictly downward
 
 ```
-DATA SOURCE (mock, WebSocket, HTTP, replay)
-    ↓
-UI MODEL / STORE (ConsoleSnapshot)
-    ↓
-PIXIJS VIEWS (displays, terminal output)
+SHIP SYSTEMS SERVER                  CONSOLE
+packages/systems/*  ──WebSocket──▶  WebSocketConsoleDataSource
+packages/server                      ↓
+                                   UI MODEL / STORE (ConsoleSnapshot)
+                                    ↓
+                                   PIXIJS VIEWS (displays, terminal output)
 ```
 
 Never allow rendering code to mutate ship state. PixiJS views are consumers, not producers of game data.
@@ -135,6 +127,20 @@ class PowerPanel { power = 98; }
 
 No buttons, tabs, dropdowns, clickable headers, switches, sliders, hover states, pointer cursors, or touch targets. All diagnostic panels are instruments — they display information, they do not respond to clicking.
 
+### Every ship system is a `ShipSystem`
+
+```ts
+interface ShipSystem {
+  readonly id: string;
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  getSnapshot(): SystemSnapshot;
+  subscribe(listener: (snapshot: SystemSnapshot) => void): () => void;
+}
+```
+
+The server's registry treats all systems uniformly. Adding a system = a new `packages/systems/<name>` package plus one entry in `packages/server/src/index.ts`.
+
 ### Disposable pattern
 
 Every component that owns listeners or timers implements `Disposable`:
@@ -143,13 +149,13 @@ Every component that owns listeners or timers implements `Disposable`:
 interface Disposable { destroy(): void; }
 ```
 
-The root console cleans up timers, DOM listeners, resize listeners, data subscriptions, and Pixi containers on teardown.
+The root console cleans up timers, DOM listeners, resize listeners, data subscriptions, and Pixi containers on teardown. The server stops all registered systems on SIGINT/SIGTERM.
 
 ## Data Contracts
 
-### ConsoleSnapshot
+### ConsoleSnapshot (console-side assembly)
 
-The single state shape pushed from data sources to all displays:
+The console's `WebSocketConsoleDataSource` assembles per-system server slices (live if connected, otherwise mock) into the single state shape pushed to all displays:
 
 ```ts
 interface ConsoleSnapshot {
@@ -171,11 +177,24 @@ interface ConsoleSnapshot {
 ```ts
 interface ConsoleDataSource {
   getSnapshot(): Promise<ConsoleSnapshot>;
-  subscribe?(listener: (snapshot: ConsoleSnapshot) => void): () => void;
+  subscribe(listener: (snapshot: ConsoleSnapshot) => void): () => void;
 }
 ```
 
-Phase 1 uses `MockConsoleDataSource`. Future phases will use `WebSocketConsoleDataSource` and potentially `ReplayConsoleDataSource`.
+`WebSocketConsoleDataSource` is the live source (used by `main.ts`). It merges the live `power` slice from the server into the mock's snapshot for all not-yet-simulated systems, so a missing server degrades gracefully to full mock data.
+
+### ShipSystem / transport
+
+Per-system snapshot slices travel over WebSocket as:
+
+```ts
+interface SystemUpdateMessage {
+  type: "SYSTEM_UPDATE";
+  systemId: string;                    // e.g. "power"
+  snapshot: SystemSnapshot;            // timestamped telemetry slice
+}
+interface SubscribeMessage { type: "SUBSCRIBE"; systemIds: string[]; }
+```
 
 ### TerminalService
 
@@ -185,7 +204,7 @@ interface TerminalService {
 }
 ```
 
-Phase 1 uses `MockTerminalService` which returns `"apologies, I am unable to connect to the ships systems at this time."` for every valid message. No command parsing, no fake AI.
+Currently uses `MockTerminalService` which returns `"apologies, I am unable to connect to the ships systems at this time."` for every valid message. No command parsing, no fake AI, no server routing yet.
 
 ### SystemStatus
 
@@ -203,10 +222,11 @@ type SystemStatus = "nominal" | "degraded" | "warning" | "critical" | "offline";
 - **Pixel-snap coordinates**: `x = Math.round(x)` for crisp rendering
 - **All colors and spacing from `ConsoleTheme`** — no inline hex literals scattered through components
 - **Classes extend `Container`** for composite components, implement `Disposable` if they own resources
+- **Shared types live in `@space-journey/contracts`** — never re-declare telemetry shapes locally
 
 ## Theme & Layout
 
-### ConsoleTheme (`src/console/core/ConsoleTheme.ts`)
+### ConsoleTheme (`packages/console/src/console/core/ConsoleTheme.ts`)
 
 Single source of truth for all visual constants:
 
@@ -217,7 +237,7 @@ Single source of truth for all visual constants:
 
 Import and reference through the object. Never hardcode hex values or pixel sizes.
 
-### ConsoleLayout (`src/console/core/ConsoleLayout.ts`)
+### ConsoleLayout (`packages/console/src/console/core/ConsoleLayout.ts`)
 
 Fixed 1280×720 virtual resolution. The application scales this to fit the browser viewport while maintaining aspect ratio. Layout defines `PanelRect` positions for all 11 panel regions:
 
@@ -282,7 +302,7 @@ The terminal is the single most important component. Responsibilities are strict
 1. **CommandTerminal** — Rendering only. Displays conversation history and cursor. Does not interpret commands.
 2. **TerminalBuffer** — Manages bounded line history (~50–100 lines), text wrapping, auto-scroll to newest content, truncation of old entries.
 3. **TerminalInputController** — Hidden DOM `<textarea>` captures keyboard input (for reliable IME, paste, mobile keyboard support). PixiJS terminal renders the text visually; the DOM input exists only to capture keystrokes.
-4. **TerminalService** — Interface for command processing. `send(message) → Promise<string>`. Phase 1 uses MockTerminalService.
+4. **TerminalService** — Interface for command processing. `send(message) → Promise<string>`. Currently uses MockTerminalService.
 
 ### Submission flow
 
@@ -315,7 +335,7 @@ Different data types update at different rates. Do not tie everything to the Pix
 | Starfield drift | every frame |
 | Terminal cursor blink | ~500 ms |
 | Clock / countdown | 1 Hz |
-| Telemetry snapshot | 1 Hz |
+| Telemetry snapshot | 1 Hz (server systems tick at 1 Hz) |
 | Alarm lights | 1 Hz or event-driven |
 | Navigation numeric data | 1 Hz |
 | Navigation plot redraw | 10 seconds |
@@ -335,27 +355,29 @@ formatVelocity(12400);       // "12.4K M/S"
 
 All displays use these helpers for consistent formatting.
 
-## Non-Goals (Phase 1)
+## Non-Goals (current phase)
 
 Do **not** implement:
 
-- Actual spacecraft simulation or orbital physics
-- Server connectivity, WebSockets, or LLM integration
-- Ship AI, real alarms, audio, settings, menus
+- Orbital physics or a full mission model in the simulation
+- Terminal routing to the ship computer / LLM integration / fake AI
+- Real alarms, audio, settings, menus
 - Inventory, player accounts, save games
 - Tooltips, tutorials, hover states
 - Clickable UI controls of any kind
 - Mobile layout or responsive panel rearrangement
 - Custom shaders, CRT barrel distortion, bloom, chromatic aberration
 - Elaborate sprite artwork or 3D rendering
-- External font files (use monospaced system font in Phase 1)
+- External font files (use monospaced system font in this phase)
 
 ## Future Phase Notes
 
 Do not implement now, but ensure today's interfaces make these transitions straightforward:
 
-**Data source swap**: `MockConsoleDataSource` → `WebSocketConsoleDataSource` receiving `ConsoleSnapshot` over WebSocket from the game server. Displays must remain unaware of this change.
+**Adding a system**: add `packages/systems/<name>` implementing `ShipSystem`, register it in `packages/server/src/index.ts`, and extend `WebSocketConsoleDataSource` to subscribe to its `systemId` and merge its slice into `ConsoleSnapshot`. Other systems and the displays remain untouched.
 
-**Terminal backend**: `TerminalService.send()` will eventually call `POST /computer/message` and receive responses from a Ship Computer Agent. The mock implementation returns a fixed string.
+**Splitting a system to its own process**: each system is an independent workspace package with `start()/stop()`. When one outgrows a shared process, give it its own `index.ts` and forward its `ShipSystem` updates over the network — the contracts and message envelope already match.
 
-**The intended Phase 1 result is not merely a mockup.** It should be a working instrumentation client with fake instrumentation data, ready to have the real spacecraft simulation plugged into it later.
+**Terminal backend**: `TerminalService.send()` will eventually call `POST /computer/message` and receive responses from a Ship Computer Agent on the same server. The mock implementation returns a fixed string.
+
+**The intended result is not merely a mockup.** It should be a working instrumentation client with fake instrumentation data, ready to have the real spacecraft simulation plugged into it later.

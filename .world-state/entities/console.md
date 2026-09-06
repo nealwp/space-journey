@@ -2,10 +2,10 @@
 id: console
 type: entity
 status: current
-updated: 2026-08-27
+updated: 2026-09-06
 owner_paths:
-  - src/console/CaptainConsole.ts
-  - src/main.ts
+  - packages/console/src/console/CaptainConsole.ts
+  - packages/console/src/main.ts
 links:
   - core
   - components
@@ -13,6 +13,8 @@ links:
   - displays
   - data
   - planning
+  - contracts
+  - 2026-09-06-ship-systems-architecture
 ---
 Top-level orchestrator that owns the root container, draws the chassis, and composes all panel placeholders.
 
@@ -21,11 +23,11 @@ Top-level orchestrator that owns the root container, draws the chassis, and comp
 The console subsystem contains:
 
 - **CaptainConsole** — Extends `Container`, implements `Disposable`. Accepts a `ConsoleDataSource` in its constructor. Draws the gray industrial chassis (outer + inner rounded rectangles) and composes all 12 panel regions as labeled placeholders using the layout from `ConsoleLayout`. Each panel gets a bezel border, dark screen background, and title label.
-- **main.ts** — Bootstrap entry point. Creates `ConsoleApplication`, initializes it, creates `MockConsoleDataSource` and `CaptainConsole`, calls `start()` to subscribe to data, adds it to the root container, and registers cleanup on `beforeunload`.
+- **main.ts** — Bootstrap entry point. Creates `ConsoleApplication`, initializes it, creates `WebSocketConsoleDataSource` (ws://<host>:8080, overridable via `VITE_SYSTEMS_WS_URL`) and `CaptainConsole`, calls `start()` to subscribe to data, adds it to the root container, and registers cleanup on `beforeunload`.
 
 ## Current state
 
-Step 11 complete. CaptainConsole renders:
+Phase 2 underway. CaptainConsole renders:
 - Gray chassis with inner dark border
 - 12 labeled panel placeholders using `Panel` component
 - Command terminal in mainTerminal panel with greeting, input, cursor, and submission flow
@@ -36,6 +38,7 @@ Step 11 complete. CaptainConsole renders:
 - No hardcoded initial data in init methods — components are created but data comes from the data source
 - Proper cleanup via `destroy()` method — unsubscribes from data source, destroys panels, cleans up input controller
 - Uses `ConsoleTheme.contentPad` instead of hardcoded `border.inner + 2`
+- Displays and `applySnapshot()` unchanged by the live-server wiring — the data source swap is invisible to them
 
 ## Gotchas / non-obvious constraints
 

@@ -2,11 +2,11 @@
 id: core
 type: entity
 status: current
-updated: 2026-08-27
+updated: 2026-09-06
 owner_paths:
-  - src/console/core/ConsoleApplication.ts
-  - src/console/core/ConsoleLayout.ts
-  - src/console/core/ConsoleTheme.ts
+  - packages/console/src/console/core/ConsoleApplication.ts
+  - packages/console/src/console/core/ConsoleLayout.ts
+  - packages/console/src/console/core/ConsoleTheme.ts
 links:
   - planning
   - 2026-08-26-project-init
