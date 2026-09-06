@@ -1506,6 +1506,34 @@ The Pixi displays should never need to know that transition happened.
 
 The intended Phase 1 result is therefore not merely a mockup. It should be a **working instrumentation client with fake instrumentation data**, ready to have the real spacecraft simulation plugged into it later.
 
+---
+
+# 38. Phase 2 — Ship Systems on a Shared Server
+
+Phase 2 builds the ship's internal simulated systems in the same repository, running on a single server for as long as possible. Systems are added **one at a time**; each lives in its own npm workspace package so it can later be promoted to its own process without touching the others.
+
+## Repository layout
+
+```text
+packages/
+  contracts/            Shared, dependency-free types + ShipSystem interface + WS message envelope
+  systems/<name>/       One package per ship system (implements ShipSystem)
+  server/               Single ship-systems server (hosts registered systems over WebSocket)
+  console/              PixiJS captain's console (Vite app, connects to server)
+```
+
+## Adding a system
+
+1. Create `packages/systems/<name>` implementing `ShipSystem` (its telemetry slice type lives in `contracts`).
+2. Register it in `packages/server/src/index.ts`.
+3. Extend the console's `WebSocketConsoleDataSource` to subscribe to its `systemId` and merge its slice into `ConsoleSnapshot`.
+
+No other system changes. The registry, transport, and displays are untouched.
+
+## Degradation path
+
+`WebSocketConsoleDataSource` merges live server slices over the mock's snapshot for systems not yet simulated, so the full console stays alive whether the server is running or not.
+
 [1]: https://pixijs.com/8.x/guides/components/application?utm_source=chatgpt.com "Application | PixiJS"
 [2]: https://pixijs.com/8.x/guides/components/events?utm_source=chatgpt.com "Events / Interaction | PixiJS"
 [3]: https://pixijs.com/8.x/guides/components/scene-objects/text/bitmap?utm_source=chatgpt.com "Bitmap Text | PixiJS"
