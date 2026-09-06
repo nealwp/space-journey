@@ -1,6 +1,6 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-import type { NavigationDisplayData } from "../data/types";
+import type { NavigationDisplayData } from "@space-journey/contracts";
 import { formatRangeKm, formatDuration } from "../utils/formatting";
 import { drawDashedLine } from "../rendering/primitives";
 

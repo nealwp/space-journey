@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
-import type { EnvironmentTelemetry } from "../data/types";
+import type { EnvironmentTelemetry } from "@space-journey/contracts";
 import { formatTemperature } from "../utils/formatting";
 import { measureLabelWidth } from "../utils/measureLabelWidth";
 

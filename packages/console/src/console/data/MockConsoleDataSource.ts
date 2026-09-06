@@ -12,7 +12,7 @@ import type {
   LogEntry,
   MissionTelemetry,
   IndicatorState,
-} from "./types";
+} from "@space-journey/contracts";
 import { Layout } from "../core/ConsoleLayout";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 

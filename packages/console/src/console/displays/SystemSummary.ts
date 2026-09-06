@@ -1,6 +1,6 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-import type { MissionTelemetry } from "../data/types";
+import type { MissionTelemetry } from "@space-journey/contracts";
 import type { Disposable } from "../core/ConsoleApplication";
 import { formatRangeKm, formatDuration } from "../utils/formatting";
 

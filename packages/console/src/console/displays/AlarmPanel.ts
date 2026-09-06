@@ -1,6 +1,6 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-import type { AlarmEntry } from "../data/types";
+import type { AlarmEntry } from "@space-journey/contracts";
 
 const CHARS_PER_SECOND = 40;
 

@@ -1,6 +1,6 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
-import type { LogEntry } from "../data/types";
+import type { LogEntry } from "@space-journey/contracts";
 
 const MAX_CHARS = 22;
 const CHARS_PER_SECOND = 40;

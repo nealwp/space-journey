@@ -1,7 +1,7 @@
 import { Container, Text, TextStyle } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { StatusIndicator } from "../components/StatusIndicator";
-import type { AlarmMatrixData, AlarmMatrixRow, IndicatorState } from "../data/types";
+import type { AlarmMatrixData, AlarmMatrixRow, IndicatorState } from "@space-journey/contracts";
 import type { Disposable } from "../core/ConsoleApplication";
 
 

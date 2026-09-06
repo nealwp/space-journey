@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
-import type { PropulsionTelemetry } from "../data/types";
+import type { PropulsionTelemetry } from "@space-journey/contracts";
 import { formatPercent } from "../utils/formatting";
 import { formatStatus, statusColor } from "../utils/status";
 import { measureLabelWidth } from "../utils/measureLabelWidth";

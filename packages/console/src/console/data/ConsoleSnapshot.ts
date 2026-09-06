@@ -9,7 +9,7 @@ import type {
   AlarmEntry,
   LogEntry,
   MissionTelemetry,
-} from "./types";
+} from "@space-journey/contracts";
 
 export interface ConsoleSnapshot {
   timestamp: number;

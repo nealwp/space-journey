@@ -1,6 +1,6 @@
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import type { TelemetryColor } from "../core/ConsoleTheme";
-import type { SystemStatus } from "../data/types";
+import type { SystemStatus } from "@space-journey/contracts";
 
 export function formatStatus(s: SystemStatus): string {
   switch (s) {

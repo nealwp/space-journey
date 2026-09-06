@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
 import { ConsoleTheme } from "../core/ConsoleTheme";
 import { TelemetryText } from "../components/TelemetryText";
-import type { PowerDistributionTelemetry } from "../data/types";
+import type { PowerDistributionTelemetry } from "@space-journey/contracts";
 import { formatStatus, statusColor } from "../utils/status";
 
 export class PowerDistributionDisplay extends Container {
