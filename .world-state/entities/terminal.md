@@ -2,12 +2,12 @@
 id: terminal
 type: entity
 status: current
-updated: 2026-08-27
+updated: 2026-09-06
 owner_paths:
-  - src/console/terminal/CommandTerminal.ts
-  - src/console/terminal/TerminalBuffer.ts
-  - src/console/terminal/TerminalInputController.ts
-  - src/console/terminal/TerminalService.ts
+  - packages/console/src/console/terminal/CommandTerminal.ts
+  - packages/console/src/console/terminal/TerminalBuffer.ts
+  - packages/console/src/console/terminal/TerminalInputController.ts
+  - packages/console/src/console/terminal/TerminalService.ts
 links:
   - core
   - console

@@ -2,12 +2,12 @@
 id: components
 type: entity
 status: current
-updated: 2026-08-27
+updated: 2026-09-06
 owner_paths:
-  - src/console/components/Panel.ts
-  - src/console/components/TelemetryText.ts
-  - src/console/components/StatusIndicator.ts
-  - src/console/components/BarMeter.ts
+  - packages/console/src/console/components/Panel.ts
+  - packages/console/src/console/components/TelemetryText.ts
+  - packages/console/src/console/components/StatusIndicator.ts
+  - packages/console/src/console/components/BarMeter.ts
 links:
   - core
   - console
