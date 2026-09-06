@@ -1,0 +1,24 @@
+{
+  "name": "@space-journey/server",
+  "version": "1.0.0",
+  "description": "Ship systems server — hosts and broadcasts simulated ship systems over WebSocket",
+  "license": "ISC",
+  "author": "nealwp",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@space-journey/contracts": "1.0.0",
+    "@space-journey/system-power": "1.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.19.0",
+    "typescript": "^7.0.2"
+  }
+}
